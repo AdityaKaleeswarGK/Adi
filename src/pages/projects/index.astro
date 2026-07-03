@@ -24,7 +24,27 @@ const gh = async (url: string) => {
 };
 
 // repos under other owners that belong on this page too
-const EXTRA_REPOS = ["HyperKuvid-Labs/alpha-stack", "HyperKuvid-Labs/DGAT"];
+const EXTRA_REPOS = [
+  "HyperKuvid-Labs/alpha-stack",
+  "HyperKuvid-Labs/DGAT",
+  "TeamVyadhVIT/strawberry_cheesecake",
+];
+
+// cards for repos the API can't see (private / org-restricted) — added manually
+// so they still show up. Facts from the résumé / experience section.
+const MANUAL_CARDS: Card[] = [
+  {
+    repo: "TeamVyadhVIT/strawberry_cheesecake",
+    title: "strawberry_cheesecake",
+    description:
+      "Team Vyadh's Mars-rover autonomous stack — ROS 2 (Nav2) + SLAM with frontier exploration inside dynamic GPS geofences, EKF state estimation, and an Astro-Bio telemetry GUI.",
+    language: "python",
+    tags: ["robotics", "ros2", "slam", "python"],
+    link: "https://github.com/TeamVyadhVIT/strawberry_cheesecake",
+    pushedAt: null,
+    stars: 0,
+  },
+];
 
 // the highlights, in the exact order they should appear (working → done)
 const FEATURED = [
@@ -35,6 +55,7 @@ const FEATURED = [
   "adityakaleeswargk/cgls_gaden",
   "adityakaleeswargk/ecc-pipeline",
   "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process",
+  "teamvyadhvit/strawberry_cheesecake",
   "adityakaleeswargk/natural_language_to_data_visualization",
 ];
 
@@ -44,6 +65,7 @@ const DONE_OVERRIDES = new Set([
   "adityakaleeswargk/cgls_gaden",
   "adityakaleeswargk/ecc-pipeline",
   "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process",
+  "teamvyadhvit/strawberry_cheesecake",
 ]);
 
 // domain tags per repo (language gets appended automatically as a tag)
@@ -56,6 +78,7 @@ const DOMAIN_TAGS: Record<string, string[]> = {
   "adityakaleeswargk/ecc-pipeline": ["ml", "conformal"],
   "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process": ["robotics", "perception"],
   "adityakaleeswargk/natural_language_to_data_visualization": ["llm", "agentic", "data-viz"],
+  "teamvyadhvit/strawberry_cheesecake": ["robotics", "ros2", "slam"],
   "adityakaleeswargk/stress-calc-pinn": ["pinn", "ml"],
   "adityakaleeswargk/doc_scrapper": ["developer-tools", "agentic"],
   "adityakaleeswargk/soorudhan_mukiyam": ["full-stack"],
@@ -152,6 +175,11 @@ if (Array.isArray(userRepos)) {
       stars: 0,
     });
   }
+}
+
+// add manual cards for anything the API couldn't return (private repos)
+for (const m of MANUAL_CARDS) {
+  if (!cards.some((c) => c.repo.toLowerCase() === m.repo.toLowerCase())) cards.push(m);
 }
 
 // Status rule: pushed in 2026 → working, otherwise done — DONE_OVERRIDES win.
