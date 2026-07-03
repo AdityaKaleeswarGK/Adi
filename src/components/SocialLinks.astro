@@ -1,0 +1,56 @@
+---
+// Icon-only social row used in both home heroes. Each link carries an
+// aria-label so screen readers announce more than "link".
+import { site } from "../site.config";
+
+interface Props {
+  class?: string;
+  linkClass?: string;
+}
+const {
+  class: className = "flex items-center gap-6 text-muted",
+  linkClass = "hover:text-accent transition-all hover:-translate-y-0.5 duration-200",
+} = Astro.props;
+
+const links = [
+  {
+    label: "GitHub",
+    href: site.links.github,
+    external: true,
+    icon: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>',
+  },
+  {
+    label: "X / Twitter",
+    href: site.links.twitter,
+    external: true,
+    icon: '<path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>',
+  },
+  {
+    label: "LinkedIn",
+    href: site.links.linkedin,
+    external: true,
+    icon: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle>',
+  },
+  {
+    label: "Email",
+    href: site.links.email ? `mailto:${site.links.email}` : "",
+    external: false,
+    icon: '<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>',
+  },
+].filter((l) => l.href);
+---
+
+<div class={className}>
+  {links.map((l) => (
+    <a
+      href={l.href}
+      class={linkClass}
+      target={l.external ? "_blank" : undefined}
+      rel={l.external ? "noopener noreferrer" : undefined}
+      aria-label={l.label}
+      title={l.label}
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={l.icon} />
+    </a>
+  ))}
+</div>

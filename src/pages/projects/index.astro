@@ -1,0 +1,243 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GitHubIcon from "../../components/GitHubIcon.astro";
+import { site } from "../../site.config";
+
+// All public repos from the GitHub API (forks excluded), plus a few repos that
+// live under other orgs. Tags = repo topics + language → power the tag filter
+// and search below.
+const token = import.meta.env.GITHUB_TOKEN;
+const gh = async (url: string) => {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "portfolio-site",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null;
+  }
+};
+
+// repos under other owners that belong on this page too
+const EXTRA_REPOS = ["HyperKuvid-Labs/alpha-stack", "HyperKuvid-Labs/DGAT"];
+
+// these are wrapped-up projects regardless of recent commits (HazMap is done)
+const DONE_OVERRIDES = new Set([
+  "adityakaleeswargk/hazpatrol",
+  "adityakaleeswargk/cgls_gaden",
+  "adityakaleeswargk/ecc-pipeline",
+]);
+
+type Card = {
+  repo: string;
+  title: string;
+  description: string;
+  tags: string[];
+  link: string;
+  pushedAt: string | null;
+};
+
+let cards: Card[] = [];
+const userRepos = await gh(
+  `https://api.github.com/users/${site.githubUsername}/repos?per_page=100&type=public`,
+);
+
+if (Array.isArray(userRepos)) {
+  const own = userRepos.filter(
+    (r) => !r.fork && r.name.toLowerCase() !== site.githubUsername.toLowerCase(),
+  );
+  const extras = (await Promise.all(
+    EXTRA_REPOS.map((full) => gh(`https://api.github.com/repos/${full}`)),
+  )).filter(Boolean);
+
+  cards = [...own, ...extras].map((r) => ({
+    repo: r.full_name,
+    title: r.name,
+    description: r.description ?? "",
+    // tag filtering is space-delimited, so tags themselves can't contain spaces
+    tags: [
+      ...new Set([
+        ...(r.topics ?? []),
+        ...(r.language ? [String(r.language).toLowerCase().replace(/\s+/g, "-")] : []),
+      ]),
+    ] as string[],
+    link: r.html_url,
+    pushedAt: r.pushed_at ?? null,
+  }));
+} else {
+  // API rate-limited at build time → fall back to scraping the pinned repos so
+  // the page is never empty. Set GITHUB_TOKEN to always get the full list.
+  const res = await fetch(`https://github.com/${site.githubUsername}`);
+  const html = await res.text();
+  const itemRegex =
+    /<div class="pinned-item-list-item-content">[\s\S]*?href="\/([^"]+)"[\s\S]*?<p class="pinned-item-desc[^>]*>\s*([\s\S]*?)\s*<\/p>[\s\S]*?(?:<span itemprop="programmingLanguage">([^<]+)<\/span>)?/g;
+  let match;
+  while ((match = itemRegex.exec(html)) !== null) {
+    const repoPath = match[1];
+    cards.push({
+      repo: repoPath,
+      title: repoPath.split("/").pop() || repoPath,
+      description: match[2].trim().replace(/<\/?[^>]+(>|$)/g, ""),
+      tags: match[3] ? [match[3].trim().toLowerCase().replace(/\s+/g, "-")] : [],
+      link: `https://github.com/${repoPath}`,
+      pushedAt: null,
+    });
+  }
+}
+
+// Status rule: pushed in 2026 → working, otherwise done — with the explicit
+// DONE_OVERRIDES above winning either way.
+const items = cards
+  .map((c) => {
+    const pushed = c.pushedAt ? new Date(c.pushedAt) : null;
+    const status: "working" | "done" = DONE_OVERRIDES.has(c.repo.toLowerCase())
+      ? "done"
+      : pushed
+        ? pushed.getFullYear() >= 2026
+          ? "working"
+          : "done"
+        : "working";
+    return { ...c, status };
+  })
+  .sort((a, b) => (b.pushedAt ?? "").localeCompare(a.pushedAt ?? ""));
+
+const tagCounts = new Map<string, number>();
+items.forEach(it => {
+  it.tags.forEach(t => {
+    tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+  });
+});
+
+const allTags = [...tagCounts.keys()].sort((a, b) => {
+  const diff = tagCounts.get(b)! - tagCounts.get(a)!;
+  if (diff !== 0) return diff;
+  return a.toLowerCase().localeCompare(b.toLowerCase());
+});
+---
+
+<BaseLayout title="Projects" description="Things I've built.">
+  <div class="container-wide pb-16">
+    <h1 class="text-3xl font-bold tracking-tight md:text-4xl">Projects</h1>
+
+    <!-- search + tag filter -->
+    <div class="mt-8 flex flex-col gap-4">
+      <input
+        id="proj-search"
+        type="search"
+        placeholder="Search projects…"
+        class="w-full max-w-xl rounded-xl border border-border bg-surface px-5 py-3.5 text-base text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+      />
+      <div id="proj-tags" class="flex flex-wrap gap-2">
+        <button type="button" data-tag="" class="proj-tag tag is-active shrink-0">All</button>
+        {allTags.map((t) => (
+          <button type="button" data-tag={t} class="proj-tag tag gap-1 shrink-0">
+            {t}
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-tag-close hidden opacity-70 hover:opacity-100 transition-opacity"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div id="proj-grid" class="mt-8 grid gap-5 sm:grid-cols-2">
+      {
+        items.map((it) => (
+          <article
+            class="card-hover flex flex-col rounded-xl border border-border bg-surface p-6 transition-colors"
+            data-tags={it.tags.join(" ")}
+            data-search={`${it.title} ${it.description} ${it.tags.join(" ")}`.toLowerCase()}
+          >
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-lg font-semibold text-fg">{it.title}</h3>
+              {it.status === "done" && (
+                <span class="tag shrink-0 border-done/50 text-done">
+                  <span class="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-done" />
+                  done
+                </span>
+              )}
+              {it.status === "working" && (
+                <span class="tag shrink-0 border-working/50 text-working">
+                  <span class="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-working" />
+                  working
+                </span>
+              )}
+            </div>
+            <p class="mt-2 flex-1 text-sm text-muted">{it.description}</p>
+            {it.tags.length > 0 && (
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                {it.tags.map((t) => (
+                  <span class="tag">{t}</span>
+                ))}
+              </div>
+            )}
+            <div class="mt-5 flex gap-4 text-sm">
+              <a
+                href={it.link}
+                class="link-accent inline-flex items-center gap-1.5"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GitHubIcon class="h-4 w-4" />
+                Repo →
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <p id="proj-empty" class="mt-8 hidden text-sm text-muted">No projects match that filter.</p>
+  </div>
+</BaseLayout>
+
+<script>
+  const search = document.getElementById("proj-search") as HTMLInputElement | null;
+  const grid = document.getElementById("proj-grid");
+  const empty = document.getElementById("proj-empty");
+  const cards = grid ? [...grid.querySelectorAll<HTMLElement>("[data-search]")] : [];
+  const tagBtns = [...document.querySelectorAll<HTMLElement>(".proj-tag")];
+  const allBtn = document.querySelector<HTMLElement>('.proj-tag[data-tag=""]');
+  const active = new Set<string>();
+
+  const apply = () => {
+    const q = (search?.value ?? "").trim().toLowerCase();
+    const searchTerms = q ? q.split(/\s+/) : [];
+    let visible = 0;
+    
+    cards.forEach((c) => {
+      const tags = (c.dataset.tags ?? "").split(" ").filter(Boolean);
+      const okTag = active.size === 0 || [...active].every((t) => tags.includes(t));
+      const searchStr = c.dataset.search ?? "";
+      const okText = searchTerms.length === 0 || searchTerms.every((term) => searchStr.includes(term));
+      
+      const show = okTag && okText;
+      c.style.display = show ? "" : "none";
+      if (show) visible++;
+    });
+    
+    empty?.classList.toggle("hidden", visible > 0);
+  };
+
+  const sync = () => {
+    allBtn?.classList.toggle("is-active", active.size === 0);
+    tagBtns.forEach((x) => {
+      const t = x.dataset.tag ?? "";
+      if (t !== "") x.classList.toggle("is-active", active.has(t));
+    });
+  };
+
+  search?.addEventListener("input", apply);
+  tagBtns.forEach((b) =>
+    b.addEventListener("click", () => {
+      const tag = b.dataset.tag ?? "";
+      if (tag === "") active.clear();
+      else if (active.has(tag)) active.delete(tag);
+      else active.add(tag);
+      sync();
+      apply();
+    }),
+  );
+</script>

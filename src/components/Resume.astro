@@ -1,0 +1,46 @@
+---
+// Résumé section — inline PDF preview + open/download buttons.
+// Update by replacing public/resume.pdf (path set in site.config.ts).
+import { site } from "../site.config";
+
+const downloadName = `${site.name.replace(/\s+/g, "_")}_Resume.pdf`;
+---
+
+<section id="resume">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-lg font-semibold">Résumé</h2>
+    <div class="flex gap-3">
+      <a
+        href={site.resumeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-lg border border-border px-4 py-2 text-sm transition-colors hover:border-accent hover:text-accent"
+      >
+        Open ↗
+      </a>
+      <a
+        href={site.resumeUrl}
+        download={downloadName}
+        class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-[#06120d] transition-colors hover:bg-accent-hover"
+      >
+        Download PDF ↓
+      </a>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-border bg-surface">
+    <object
+      data={`${site.resumeUrl}#view=FitH`}
+      type="application/pdf"
+      class="h-[600px] w-full md:h-[820px]"
+    >
+      <!-- shown if the browser can't render the PDF inline (e.g. some phones) -->
+      <div class="flex flex-col items-center gap-3 p-10 text-center text-sm text-muted">
+        <p>Your browser can't preview PDFs inline.</p>
+        <a href={site.resumeUrl} download={downloadName} class="link-accent">
+          Download the résumé ↓
+        </a>
+      </div>
+    </object>
+  </div>
+</section>

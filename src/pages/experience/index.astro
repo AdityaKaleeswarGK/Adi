@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import Experience from "../../components/Experience.astro";
+---
+
+<BaseLayout title="Experience" description="My professional timeline and work experience.">
+  <div class="container-tight pb-16">
+    <PageHeader
+      title="Experience"
+      subtitle="A timeline of my work, internships, and professional journey."
+    />
+    <div class="mt-8">
+      <Experience />
+    </div>
+  </div>
+</BaseLayout>

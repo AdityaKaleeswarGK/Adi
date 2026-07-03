@@ -1,0 +1,88 @@
+---
+// A dated timeline of what Aditya is working on / reading / exploring.
+// Pass `limit` to show only the most recent N (used on the home page).
+import { getCollection } from "astro:content";
+
+interface Props {
+  limit?: number;
+}
+const { limit } = Astro.props;
+
+let items = (await getCollection("exploring")).sort(
+  (a, b) => +b.data.date - +a.data.date,
+);
+if (limit) items = items.slice(0, limit);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+const kindLabel: Record<string, string> = {
+  working: "working on",
+  shipped: "shipped",
+  course: "course",
+  paper: "paper",
+  article: "article",
+  blog: "blog",
+  reading: "reading",
+};
+---
+
+{
+  items.length === 0 ? (
+    <p class="text-sm text-muted">
+      Nothing logged yet — add an entry in <code class="font-mono text-accent">src/content/exploring/</code>.
+    </p>
+  ) : (
+    <ol class="timeline relative ml-1 border-l border-border">
+      {items.map((it) => (
+        <li class="timeline-item relative ml-4 pb-8 pl-6 last:pb-0">
+          <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
+          <time class="font-mono text-xs text-faint">{fmt(it.data.date)}</time>
+          <div class="mt-1 flex flex-wrap items-center gap-2">
+            <span class="tag border-accent/40 text-accent">{kindLabel[it.data.kind]}</span>
+            {it.data.url ? (
+              <a
+                href={it.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-fg transition-colors hover:text-accent"
+              >
+                {it.data.title} ↗
+              </a>
+            ) : (
+              <span class="font-medium text-fg">{it.data.title}</span>
+            )}
+          </div>
+          {it.data.description && (
+            <p class="mt-1.5 text-sm text-muted">{it.data.description}</p>
+          )}
+          {it.data.tags.length > 0 && (
+            <div class="mt-2 flex flex-wrap gap-1.5">
+              {it.data.tags.map((t) => (
+                <span class="tag">{t}</span>
+              ))}
+            </div>
+          )}
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+<script>
+  // Subtle fade-up as each entry scrolls into view (items are visible by default).
+  const items = document.querySelectorAll<HTMLElement>(".timeline-item");
+  if (items.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("animate-in");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.15 },
+    );
+    items.forEach((i) => io.observe(i));
+  }
+</script>

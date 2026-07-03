@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { nav } from "../site.config";
+---
+
+<BaseLayout title="404" description="Page not found.">
+  <div class="container-tight flex flex-col items-center pt-10 text-center md:pt-20">
+    <p class="font-mono text-7xl font-bold tracking-tight text-accent md:text-8xl">404</p>
+
+    <div class="mt-8 w-full max-w-md rounded-xl border border-border bg-surface p-5 text-left font-mono text-sm">
+      <p class="text-faint"><span class="text-accent">$</span> cd <span id="nf-path">this-page</span></p>
+      <p class="mt-2 text-muted">cd: no such file or directory</p>
+      <p class="mt-2 text-faint"><span class="text-accent">$</span> <span class="nf-cursor">▊</span></p>
+    </div>
+
+    <p class="mt-8 max-w-md text-muted">
+      This page doesn't exist (or moved). Here's where you probably wanted to go:
+    </p>
+
+    <div class="mt-6 flex flex-wrap justify-center gap-2">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="rounded-lg border border-border bg-surface px-4 py-2 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  @keyframes blink { 50% { opacity: 0; } }
+  .nf-cursor { animation: blink 1.1s step-end infinite; color: var(--color-accent); }
+</style>
+
+<script>
+  // show the path the visitor actually tried
+  const el = document.getElementById("nf-path");
+  if (el) el.textContent = window.location.pathname;
+</script>

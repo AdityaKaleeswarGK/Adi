@@ -1,0 +1,30 @@
+---
+import { site } from "../site.config";
+
+const year = new Date().getFullYear();
+const socials = [
+  { label: "GitHub", href: site.links.github },
+  { label: "Twitter", href: site.links.twitter },
+  { label: "LinkedIn", href: site.links.linkedin },
+  { label: "Email", href: site.links.email ? `mailto:${site.links.email}` : "" },
+].filter((s) => s.href);
+---
+
+<footer class="border-t border-border">
+  <div class="container-wide flex flex-col items-center justify-between gap-3 py-8 text-sm text-faint sm:flex-row">
+    <p>© {year} {site.name}</p>
+    {
+      socials.length > 0 && (
+        <ul class="flex items-center gap-4">
+          {socials.map((s) => (
+            <li>
+              <a href={s.href} class="transition-colors hover:text-accent" target="_blank" rel="noopener noreferrer">
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</footer>

@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  // external posts (with `url`) link out — don't generate a page for them
+  const posts = await getCollection("blog", (p) => !p.data.draft && !p.data.url);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+const readMins = Math.max(1, Math.round((post.body ?? "").split(/\s+/).length / 220));
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <article class="container-tight">
+    <a href="/blog" class="link-accent text-sm">← Blog</a>
+
+    <h1 class="mt-4 text-3xl font-bold tracking-tight">{post.data.title}</h1>
+    <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-faint">
+      <time>{fmt(post.data.date)}</time>
+      <span>· {readMins} min read</span>
+      {post.data.updated && <span>· updated {fmt(post.data.updated)}</span>}
+      {post.data.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+
+    <div class="prose mt-8">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  // accent progress bar across the top while reading
+  const bar = document.querySelector<HTMLElement>(".scroll-progress");
+  const update = () => {
+    if (!bar) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+  };
+  document.addEventListener("scroll", update, { passive: true });
+  update();
+</script>

@@ -1,0 +1,236 @@
+---
+// ⌘K / Ctrl+K command palette — quick nav + actions from anywhere on the site.
+// Opens via keyboard shortcut, the nav hint button, or a custom "cmdk:open"
+// event. Fully keyboard driven: type to filter, ↑↓ to move, ↵ to run, Esc closes.
+import { nav, site } from "../site.config";
+
+type Item = {
+  label: string;
+  hint: string;
+  action: "go" | "external" | "copy";
+  value: string;
+  icon: string;
+};
+
+const pageIcon =
+  '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>';
+const linkIcon =
+  '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>';
+const copyIcon =
+  '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';
+const fileIcon =
+  '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>';
+
+const items: Item[] = [
+  ...nav.map((n) => ({
+    label: n.label === "Home" ? "Go home" : `Go to ${n.label.toLowerCase()}`,
+    hint: n.href,
+    action: "go" as const,
+    value: n.href,
+    icon: n.label === "Resume" ? fileIcon : pageIcon,
+  })),
+  {
+    label: "Copy email",
+    hint: site.links.email,
+    action: "copy",
+    value: site.links.email,
+    icon: copyIcon,
+  },
+  { label: "Open GitHub", hint: "@" + site.githubUsername, action: "external", value: site.links.github, icon: linkIcon },
+  { label: "Open LinkedIn", hint: "linkedin.com", action: "external", value: site.links.linkedin, icon: linkIcon },
+  { label: "Open X / Twitter", hint: "x.com", action: "external", value: site.links.twitter, icon: linkIcon },
+  { label: "Download résumé", hint: "resume.pdf", action: "external", value: site.resumeUrl, icon: fileIcon },
+];
+---
+
+<div
+  id="cmdk"
+  class="cmdk fixed inset-0 z-[70] hidden items-start justify-center px-4 pt-[16vh]"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Command palette"
+>
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-cmdk-close></div>
+
+  <div class="cmdk-panel relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
+    <div class="flex items-center gap-3 border-b border-border px-4">
+      <svg class="h-4 w-4 shrink-0 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input
+        id="cmdk-input"
+        type="text"
+        placeholder="Where to?"
+        autocomplete="off"
+        spellcheck="false"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="cmdk-list"
+        aria-autocomplete="list"
+        class="w-full bg-transparent py-4 text-[15px] text-fg placeholder:text-faint focus:outline-none"
+      />
+      <span class="kbd shrink-0">esc</span>
+    </div>
+
+    <ul id="cmdk-list" role="listbox" aria-label="Commands" class="max-h-[50vh] overflow-y-auto p-2">
+      {items.map((it) => (
+        <li
+          role="option"
+          aria-selected="false"
+          tabindex="-1"
+          data-cmdk-item
+          data-action={it.action}
+          data-value={it.value}
+          data-search={it.label.toLowerCase()}
+          class="cmdk-item flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted"
+        >
+          <svg class="h-4 w-4 shrink-0 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={it.icon} />
+          <span class="cmdk-label flex-1 text-fg">{it.label}</span>
+          <span class="font-mono text-xs text-faint">{it.hint}</span>
+        </li>
+      ))}
+      <li id="cmdk-empty" class="hidden px-3 py-8 text-center text-sm text-faint">No matches.</li>
+    </ul>
+
+    <div class="flex items-center gap-4 border-t border-border px-4 py-2.5 text-[11px] text-faint">
+      <span><span class="kbd mr-1">↑↓</span> navigate</span>
+      <span><span class="kbd mr-1">↵</span> select</span>
+      <span><span class="kbd mr-1">esc</span> close</span>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* runtime-toggled selection state — global so it survives class toggling */
+  .cmdk-item.is-selected {
+    background: var(--color-surface-2);
+    box-shadow: inset 2px 0 0 var(--color-accent);
+  }
+  .cmdk.flex .cmdk-panel { animation: exp-pop-in 0.15s ease-out; }
+</style>
+
+<script>
+  const root = document.getElementById("cmdk");
+  const input = document.getElementById("cmdk-input") as HTMLInputElement | null;
+  const empty = document.getElementById("cmdk-empty");
+  const items = [...document.querySelectorAll<HTMLElement>("[data-cmdk-item]")];
+  let lastFocused: HTMLElement | null = null;
+  let selected = 0;
+
+  const visibleItems = () => items.filter((i) => !i.classList.contains("hidden"));
+
+  const paint = () => {
+    const vis = visibleItems();
+    if (selected >= vis.length) selected = Math.max(0, vis.length - 1);
+    items.forEach((i) => {
+      i.classList.remove("is-selected");
+      i.setAttribute("aria-selected", "false");
+    });
+    const cur = vis[selected];
+    if (cur) {
+      cur.classList.add("is-selected");
+      cur.setAttribute("aria-selected", "true");
+      cur.scrollIntoView({ block: "nearest" });
+    }
+    empty?.classList.toggle("hidden", vis.length > 0);
+  };
+
+  const filter = () => {
+    const q = (input?.value ?? "").trim().toLowerCase();
+    items.forEach((i) => {
+      const hit = !q || (i.dataset.search ?? "").includes(q);
+      i.classList.toggle("hidden", !hit);
+    });
+    selected = 0;
+    paint();
+  };
+
+  const open = () => {
+    if (!root) return;
+    lastFocused = document.activeElement as HTMLElement;
+    root.classList.remove("hidden");
+    root.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    if (input) input.value = "";
+    filter();
+    input?.focus();
+  };
+
+  const close = () => {
+    if (!root || root.classList.contains("hidden")) return;
+    root.classList.add("hidden");
+    root.classList.remove("flex");
+    document.body.style.overflow = "";
+    lastFocused?.focus();
+  };
+
+  const run = (item: HTMLElement) => {
+    const value = item.dataset.value ?? "";
+    switch (item.dataset.action) {
+      case "go":
+        close();
+        window.location.href = value;
+        break;
+      case "external":
+        close();
+        window.open(value, "_blank", "noopener,noreferrer");
+        break;
+      case "copy": {
+        navigator.clipboard?.writeText(value);
+        const label = item.querySelector(".cmdk-label");
+        if (label) {
+          const prev = label.textContent;
+          label.textContent = "Copied ✓";
+          setTimeout(() => {
+            label.textContent = prev;
+          }, 1200);
+        }
+        break;
+      }
+    }
+  };
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      root?.classList.contains("hidden") ? open() : close();
+      return;
+    }
+    if (root?.classList.contains("hidden")) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      selected = Math.min(selected + 1, visibleItems().length - 1);
+      paint();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      selected = Math.max(selected - 1, 0);
+      paint();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const cur = visibleItems()[selected];
+      if (cur) run(cur);
+    } else if (e.key === "Tab") {
+      // keep focus inside the palette
+      e.preventDefault();
+      input?.focus();
+    }
+  });
+
+  input?.addEventListener("input", filter);
+  items.forEach((i) => {
+    i.addEventListener("click", () => run(i));
+    i.addEventListener("pointermove", () => {
+      const idx = visibleItems().indexOf(i);
+      if (idx >= 0 && idx !== selected) {
+        selected = idx;
+        paint();
+      }
+    });
+  });
+  document
+    .querySelectorAll("[data-cmdk-close]")
+    .forEach((el) => el.addEventListener("click", close));
+  window.addEventListener("cmdk:open", open);
+</script>
