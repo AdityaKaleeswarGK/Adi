@@ -1,9 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 128 128">
-    <path d="M50.4 78.5a75.1 75.1 0 0 0-28.5 6.9l24.2-65.7c.7-2 1.9-3.2 3.4-3.2h29c1.5 0 2.7 1.2 3.4 3.2l24.2 65.7s-11.6-7-28.5-7L67 45.5c-.4-1.7-1.6-2.8-2.9-2.8-1.3 0-2.5 1.1-2.9 2.7L50.4 78.5Zm-1.1 28.2Zm-4.2-20.2c-2 6.6-.6 15.8 4.2 20.2a17.5 17.5 0 0 1 .2-.7 5.5 5.5 0 0 1 5.7-4.5c2.8.1 4.3 1.5 4.7 4.7.2 1.1.2 2.3.2 3.5v.4c0 2.7.7 5.2 2.2 7.4a13 13 0 0 0 5.7 4.9v-.3l-.2-.3c-1.8-5.6-.5-9.5 4.4-12.8l1.5-1a73 73 0 0 0 3.2-2.2 16 16 0 0 0 6.8-11.4c.3-2 .1-4-.6-6l-.8.6-1.6 1a37 37 0 0 1-22.4 2.7c-5-.7-9.7-2-13.2-6.2Z" />
-    <style>
-        path { fill: #000; }
-        @media (prefers-color-scheme: dark) {
-            path { fill: #FFF; }
-        }
-    </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- ninja snorlax — matches the hero artwork (blue headband, cream face) -->
+  <rect width="64" height="64" rx="14" fill="#141417"/>
+
+  <!-- ears -->
+  <path d="M14 23 Q11 7 25 12 Q21 16 19 21 Z" fill="#3a4448" stroke="#1c1c20" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M50 23 Q53 7 39 12 Q43 16 45 21 Z" fill="#3a4448" stroke="#1c1c20" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- head -->
+  <circle cx="32" cy="36" r="22" fill="#f2e3bd" stroke="#1c1c20" stroke-width="2.5"/>
+
+  <!-- blue headband covering the top of the head -->
+  <path d="M10.8 30 A 22 22 0 0 1 53.2 30 Q 32 35 10.8 30 Z" fill="#3f5a96" stroke="#1c1c20" stroke-width="2" stroke-linejoin="round"/>
+  <!-- headband plate -->
+  <rect x="26.5" y="19" width="11" height="6.5" rx="1.5" fill="#b9bec4" stroke="#1c1c20" stroke-width="1.5"/>
+
+  <!-- closed eyes -->
+  <path d="M21.5 39 q 3 2.4 6 0" fill="none" stroke="#1c1c20" stroke-width="2" stroke-linecap="round"/>
+  <path d="M36.5 39 q 3 2.4 6 0" fill="none" stroke="#1c1c20" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- swirl blush -->
+  <circle cx="18.5" cy="44" r="2.9" fill="#e8a7a7"/>
+  <circle cx="45.5" cy="44" r="2.9" fill="#e8a7a7"/>
+
+  <!-- mouth with tiny fangs -->
+  <path d="M28 48.5 q 4 2 8 0" fill="none" stroke="#1c1c20" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M27.6 48.9 l 2.6 0.6 l -1 -3.4 Z" fill="#fff" stroke="#1c1c20" stroke-width="1"/>
+  <path d="M36.4 48.9 l -2.6 0.6 l 1 -3.4 Z" fill="#fff" stroke="#1c1c20" stroke-width="1"/>
 </svg>
