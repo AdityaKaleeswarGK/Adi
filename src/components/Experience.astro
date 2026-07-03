@@ -1,7 +1,7 @@
 ---
-// Experience: a grid of compact cards. Click one → a large modal opens covering
-// most of the screen with the full details + links. Click ✕ / backdrop / Esc to
-// close. Content comes from src/content/experience/ (sorted by `order`).
+// Experience: a vertical timeline of roles. Each card shows the role, summary
+// and its projects/preprints as link chips; clicking anywhere else on the card
+// opens a large modal with the full story. Content: src/content/experience/.
 import { getCollection, render } from "astro:content";
 import GitHubIcon from "./GitHubIcon.astro";
 
@@ -11,33 +11,68 @@ const entries = (await getCollection("experience")).sort(
 const items = await Promise.all(
   entries.map(async (e) => ({ data: e.data, Content: (await render(e)).Content })),
 );
+
+// preprints / papers / docs get a document icon; everything else gets GitHub
+const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
 ---
 
 {
   items.length > 0 && (
     <section id="experience">
-      <div class="mb-6 flex items-baseline justify-between">
-        <h2 class="text-lg font-semibold">Experience</h2>
-      </div>
-
-      <div class="space-y-4">
+      <ol class="relative ml-1 border-l border-border">
         {items.map((it, i) => (
-          <button type="button" class="card card-hover flex w-full flex-col text-left" data-exp-open={i}>
-            <p class="font-medium text-fg">{it.data.role}</p>
-            <p class="mt-1 text-sm text-muted">
-              {it.data.org}
-              {it.data.location ? ` · ${it.data.location}` : ""}
-            </p>
-            {it.data.summary && (
-              <p class="mt-3 flex-1 text-sm text-faint">{it.data.summary}</p>
-            )}
-            <div class="mt-4 flex items-center justify-between text-xs text-faint">
-              <time>{it.data.start} – {it.data.end}</time>
-              <span class="link-accent">Expand →</span>
+          <li class="relative ml-4 pb-8 pl-6 last:pb-0">
+            <span class="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
+
+            <div
+              class="exp-card card-hover cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
+              data-exp-open={i}
+              tabindex="0"
+              role="button"
+              aria-haspopup="dialog"
+              aria-label={`${it.data.role} at ${it.data.org} — open details`}
+            >
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 class="text-lg font-semibold text-fg">{it.data.role}</h3>
+                <time class="font-mono text-xs text-accent">{it.data.start} – {it.data.end}</time>
+              </div>
+              <p class="mt-0.5 text-sm text-muted">
+                {it.data.org}
+                {it.data.location ? ` · ${it.data.location}` : ""}
+              </p>
+
+              {it.data.summary && (
+                <p class="mt-3 text-sm leading-relaxed text-faint">{it.data.summary}</p>
+              )}
+
+              {it.data.links.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {it.data.links.map((l) => (
+                    <a
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+                    >
+                      {isPaper(l.label) ? (
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                      ) : (
+                        <GitHubIcon class="h-3.5 w-3.5" />
+                      )}
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <div class="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
+                <span class="text-faint">the full story, bullet by bullet</span>
+                <span class="link-accent font-medium">Expand →</span>
+              </div>
             </div>
-          </button>
+          </li>
         ))}
-      </div>
+      </ol>
 
       {/* Modals (one per role) */}
       {items.map((it, i) => {
@@ -66,6 +101,24 @@ const items = await Promise.all(
                 {it.data.org}
                 {it.data.location ? ` · ${it.data.location}` : ""}
               </p>
+
+              {it.data.milestones.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {it.data.milestones.map((m) => (
+                    <span
+                      class:list={[
+                        "tag text-xs",
+                        m.promotion ? "border-accent/50 text-accent" : "",
+                      ]}
+                    >
+                      <span class="mr-1.5 font-mono text-[10px] text-faint">{m.date}</span>
+                      {m.label}
+                      {m.promotion && " ↑"}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div class="prose mt-6">
                 <Body />
               </div>
@@ -78,7 +131,11 @@ const items = await Promise.all(
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <GitHubIcon class="h-3.5 w-3.5" />
+                      {isPaper(l.label) ? (
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                      ) : (
+                        <GitHubIcon class="h-3.5 w-3.5" />
+                      )}
                       {l.label}
                     </a>
                   ))}
@@ -102,7 +159,6 @@ const items = await Promise.all(
     m.classList.remove("hidden");
     m.classList.add("flex");
     document.body.style.overflow = "hidden";
-    // move keyboard focus into the dialog
     m.querySelector<HTMLElement>("[data-close][aria-label]")?.focus();
   };
   const closeAll = () => {
@@ -115,9 +171,19 @@ const items = await Promise.all(
     if (wasOpen) lastFocused?.focus();
   };
 
-  document
-    .querySelectorAll<HTMLElement>("[data-exp-open]")
-    .forEach((b) => b.addEventListener("click", () => open(b.dataset.expOpen!)));
+  document.querySelectorAll<HTMLElement>("[data-exp-open]").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      // link chips inside the card navigate; everywhere else opens the modal
+      if ((e.target as Element).closest("a")) return;
+      open(card.dataset.expOpen!);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(card.dataset.expOpen!);
+      }
+    });
+  });
   document
     .querySelectorAll<HTMLElement>("[data-close]")
     .forEach((el) => el.addEventListener("click", closeAll));

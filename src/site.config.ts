@@ -7,7 +7,7 @@
 export const site = {
   name: "Aditya Kaleeswar",             // your display name
   // Shown in the browser tab + footer.
-  title: "Aditya Kaleeswar — Portfolio",
+  title: "Aditya Kaleeswar",
   // One-liner under your name on the homepage hero.
   tagline: "CS @ VIT Vellore. Building robots, physics-informed ML, and LLM agents.",
   // A slightly longer intro used on the homepage / about.
@@ -37,7 +37,7 @@ export const site = {
 export const nav = [
   { label: "Home", href: "/" },
   { label: "Projects", href: "/projects" },
-  { label: "Blog", href: "/blog" },
   { label: "Experience", href: "/experience" },
   { label: "Resume", href: "/resume" },
+  { label: "Blog", href: "/blog" },
 ] as const;

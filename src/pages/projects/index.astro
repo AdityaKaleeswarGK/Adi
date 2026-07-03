@@ -4,8 +4,9 @@ import GitHubIcon from "../../components/GitHubIcon.astro";
 import { site } from "../../site.config";
 
 // All public repos from the GitHub API (forks excluded), plus a few repos that
-// live under other orgs. Tags = repo topics + language → power the tag filter
-// and search below.
+// live under other orgs. The page opens on a curated set of highlights;
+// everything else stays in the archive until a tag / search / "everything"
+// reveals it.
 const token = import.meta.env.GITHUB_TOKEN;
 const gh = async (url: string) => {
   try {
@@ -25,26 +26,99 @@ const gh = async (url: string) => {
 // repos under other owners that belong on this page too
 const EXTRA_REPOS = ["HyperKuvid-Labs/alpha-stack", "HyperKuvid-Labs/DGAT"];
 
-// these are wrapped-up projects regardless of recent commits (HazMap is done)
+// the highlights, in the exact order they should appear (working → done)
+const FEATURED = [
+  "hyperkuvid-labs/alpha-stack",
+  "hyperkuvid-labs/dgat",
+  "adityakaleeswargk/pinnbased_shm",
+  "adityakaleeswargk/hazpatrol",
+  "adityakaleeswargk/cgls_gaden",
+  "adityakaleeswargk/ecc-pipeline",
+  "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process",
+  "adityakaleeswargk/natural_language_to_data_visualization",
+];
+
+// wrapped-up projects regardless of recent commits
 const DONE_OVERRIDES = new Set([
   "adityakaleeswargk/hazpatrol",
   "adityakaleeswargk/cgls_gaden",
   "adityakaleeswargk/ecc-pipeline",
+  "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process",
 ]);
+
+// domain tags per repo (language gets appended automatically as a tag)
+const DOMAIN_TAGS: Record<string, string[]> = {
+  "hyperkuvid-labs/alpha-stack": ["agentic", "llm", "developer-tools"],
+  "hyperkuvid-labs/dgat": ["developer-tools"],
+  "adityakaleeswargk/pinnbased_shm": ["pinn", "computer-vision", "ml"],
+  "adityakaleeswargk/hazpatrol": ["robotics", "ros2", "path-planning"],
+  "adityakaleeswargk/cgls_gaden": ["robotics", "ros2"],
+  "adityakaleeswargk/ecc-pipeline": ["ml", "conformal"],
+  "adityakaleeswargk/obstacle_pit_avoidance_using-pointcloud-process": ["robotics", "perception"],
+  "adityakaleeswargk/natural_language_to_data_visualization": ["llm", "agentic", "data-viz"],
+  "adityakaleeswargk/stress-calc-pinn": ["pinn", "ml"],
+  "adityakaleeswargk/doc_scrapper": ["developer-tools", "agentic"],
+  "adityakaleeswargk/soorudhan_mukiyam": ["full-stack"],
+  "adityakaleeswargk/meeting_summary": ["ml", "llm"],
+  "adityakaleeswargk/sales_agent": ["agentic", "llm"],
+  "adityakaleeswargk/sales_agent_langgraph": ["agentic", "llm"],
+  "adityakaleeswargk/gesture": ["computer-vision", "ml"],
+  "adityakaleeswargk/data_visualization_single_dataset": ["data-viz"],
+  "adityakaleeswargk/single_dataset": ["data-viz"],
+  "adityakaleeswargk/websocket": ["full-stack"],
+  "adityakaleeswargk/webrtc": ["full-stack"],
+  "adityakaleeswargk/musiccorner": ["full-stack"],
+  "adityakaleeswargk/music_corner": ["full-stack"],
+  "adityakaleeswargk/taste-explore-": ["full-stack"],
+  "adityakaleeswargk/web-dev-project": ["full-stack"],
+  "adityakaleeswargk/vyadh_webdev_taask": ["full-stack"],
+  "adityakaleeswargk/vyadh_react": ["full-stack"],
+};
+
+// GitHub-style language dot colors
+const LANG_COLORS: Record<string, string> = {
+  python: "#3572A5",
+  "c++": "#f34b7d",
+  javascript: "#f1e05a",
+  typescript: "#3178c6",
+  "jupyter-notebook": "#DA5B0B",
+  html: "#e34c26",
+  css: "#563d7c",
+  shell: "#89e051",
+};
 
 type Card = {
   repo: string;
   title: string;
   description: string;
+  language: string;
   tags: string[];
   link: string;
   pushedAt: string | null;
+  stars: number;
 };
 
 let cards: Card[] = [];
 const userRepos = await gh(
   `https://api.github.com/users/${site.githubUsername}/repos?per_page=100&type=public`,
 );
+
+const toCard = (r: any): Card => {
+  const key = String(r.full_name).toLowerCase();
+  const language = r.language ? String(r.language).toLowerCase().replace(/\s+/g, "-") : "";
+  return {
+    repo: r.full_name,
+    title: r.name,
+    description: r.description ?? "",
+    language,
+    tags: [
+      ...new Set([...(DOMAIN_TAGS[key] ?? []), ...(r.topics ?? []), ...(language ? [language] : [])]),
+    ] as string[],
+    link: r.html_url,
+    pushedAt: r.pushed_at ?? null,
+    stars: r.stargazers_count ?? 0,
+  };
+};
 
 if (Array.isArray(userRepos)) {
   const own = userRepos.filter(
@@ -53,21 +127,7 @@ if (Array.isArray(userRepos)) {
   const extras = (await Promise.all(
     EXTRA_REPOS.map((full) => gh(`https://api.github.com/repos/${full}`)),
   )).filter(Boolean);
-
-  cards = [...own, ...extras].map((r) => ({
-    repo: r.full_name,
-    title: r.name,
-    description: r.description ?? "",
-    // tag filtering is space-delimited, so tags themselves can't contain spaces
-    tags: [
-      ...new Set([
-        ...(r.topics ?? []),
-        ...(r.language ? [String(r.language).toLowerCase().replace(/\s+/g, "-")] : []),
-      ]),
-    ] as string[],
-    link: r.html_url,
-    pushedAt: r.pushed_at ?? null,
-  }));
+  cards = [...own, ...extras].map(toCard);
 } else {
   // API rate-limited at build time → fall back to scraping the pinned repos so
   // the page is never empty. Set GITHUB_TOKEN to always get the full list.
@@ -78,19 +138,24 @@ if (Array.isArray(userRepos)) {
   let match;
   while ((match = itemRegex.exec(html)) !== null) {
     const repoPath = match[1];
+    const language = match[3] ? match[3].trim().toLowerCase().replace(/\s+/g, "-") : "";
     cards.push({
       repo: repoPath,
       title: repoPath.split("/").pop() || repoPath,
       description: match[2].trim().replace(/<\/?[^>]+(>|$)/g, ""),
-      tags: match[3] ? [match[3].trim().toLowerCase().replace(/\s+/g, "-")] : [],
+      language,
+      tags: [
+        ...new Set([...(DOMAIN_TAGS[repoPath.toLowerCase()] ?? []), ...(language ? [language] : [])]),
+      ],
       link: `https://github.com/${repoPath}`,
       pushedAt: null,
+      stars: 0,
     });
   }
 }
 
-// Status rule: pushed in 2026 → working, otherwise done — with the explicit
-// DONE_OVERRIDES above winning either way.
+// Status rule: pushed in 2026 → working, otherwise done — DONE_OVERRIDES win.
+const featuredIndex = (repo: string) => FEATURED.indexOf(repo.toLowerCase());
 const items = cards
   .map((c) => {
     const pushed = c.pushedAt ? new Date(c.pushedAt) : null;
@@ -101,17 +166,23 @@ const items = cards
           ? "working"
           : "done"
         : "working";
-    return { ...c, status };
+    return { ...c, status, featured: featuredIndex(c.repo) !== -1 };
   })
-  .sort((a, b) => (b.pushedAt ?? "").localeCompare(a.pushedAt ?? ""));
+  .sort((a, b) => {
+    const fa = featuredIndex(a.repo);
+    const fb = featuredIndex(b.repo);
+    if (fa !== -1 || fb !== -1) {
+      if (fa === -1) return 1;
+      if (fb === -1) return -1;
+      return fa - fb;
+    }
+    return (b.pushedAt ?? "").localeCompare(a.pushedAt ?? "");
+  });
+
+const archiveCount = items.filter((i) => !i.featured).length;
 
 const tagCounts = new Map<string, number>();
-items.forEach(it => {
-  it.tags.forEach(t => {
-    tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
-  });
-});
-
+items.forEach((it) => it.tags.forEach((t) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
 const allTags = [...tagCounts.keys()].sort((a, b) => {
   const diff = tagCounts.get(b)! - tagCounts.get(a)!;
   if (diff !== 0) return diff;
@@ -119,9 +190,13 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
 });
 ---
 
-<BaseLayout title="Projects" description="Things I've built.">
+<BaseLayout title="Projects" description="Things I've built — robotics, physics-informed ML, and LLM agents.">
   <div class="container-wide pb-16">
     <h1 class="text-3xl font-bold tracking-tight md:text-4xl">Projects</h1>
+    <p class="mt-2 max-w-2xl text-muted">
+      Highlights up front — the other {archiveCount} repos live in the archive. Pick a tag,
+      search, or hit <span class="font-mono text-sm text-accent">everything</span> to dig through it all.
+    </p>
 
     <!-- search + tag filter -->
     <div class="mt-8 flex flex-col gap-4">
@@ -129,10 +204,12 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
         id="proj-search"
         type="search"
         placeholder="Search projects…"
-        class="w-full max-w-xl rounded-xl border border-border bg-surface px-5 py-3.5 text-base text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+        aria-label="Search projects"
+        class="w-full rounded-xl border border-border bg-surface px-5 py-3.5 text-base text-fg placeholder:text-faint focus:border-accent focus:outline-none"
       />
       <div id="proj-tags" class="flex flex-wrap gap-2">
-        <button type="button" data-tag="" class="proj-tag tag is-active shrink-0">All</button>
+        <button type="button" data-tag="" class="proj-tag tag is-active shrink-0">highlights</button>
+        <button type="button" data-tag="*" class="proj-tag tag shrink-0 border-dashed">everything</button>
         {allTags.map((t) => (
           <button type="button" data-tag={t} class="proj-tag tag gap-1 shrink-0">
             {t}
@@ -146,49 +223,64 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
       {
         items.map((it) => (
           <article
-            class="card-hover flex flex-col rounded-xl border border-border bg-surface p-6 transition-colors"
+            class="card-hover group flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
+            data-featured={it.featured ? "true" : undefined}
             data-tags={it.tags.join(" ")}
             data-search={`${it.title} ${it.description} ${it.tags.join(" ")}`.toLowerCase()}
           >
             <div class="flex items-start justify-between gap-3">
-              <h3 class="text-lg font-semibold text-fg">{it.title}</h3>
-              {it.status === "done" && (
+              <h3 class="font-mono text-[15px] font-semibold text-fg transition-colors group-hover:text-accent">{it.title}</h3>
+              {it.status === "done" ? (
                 <span class="tag shrink-0 border-done/50 text-done">
                   <span class="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-done" />
                   done
                 </span>
-              )}
-              {it.status === "working" && (
+              ) : (
                 <span class="tag shrink-0 border-working/50 text-working">
-                  <span class="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-working" />
+                  <span class="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-working" />
                   working
                 </span>
               )}
             </div>
-            <p class="mt-2 flex-1 text-sm text-muted">{it.description}</p>
-            {it.tags.length > 0 && (
-              <div class="mt-4 flex flex-wrap gap-1.5">
-                {it.tags.map((t) => (
-                  <span class="tag">{t}</span>
-                ))}
-              </div>
-            )}
-            <div class="mt-5 flex gap-4 text-sm">
+            {it.description && <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted">{it.description}</p>}
+            {!it.description && <div class="flex-1" />}
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              {it.tags.filter((t) => t !== it.language).map((t) => (
+                <span class="tag border-accent/25 text-[11px] text-accent/90">{t}</span>
+              ))}
+            </div>
+            <div class="mt-5 flex items-center justify-between border-t border-border pt-4 text-sm">
               <a
                 href={it.link}
                 class="link-accent inline-flex items-center gap-1.5"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={`${it.title} on GitHub`}
               >
                 <GitHubIcon class="h-4 w-4" />
                 Repo →
               </a>
+              <span class="flex items-center gap-3 text-xs text-faint">
+                {it.stars > 0 && <span>★ {it.stars}</span>}
+                {it.language && (
+                  <span class="inline-flex items-center gap-1.5">
+                    <span
+                      class="inline-block h-2 w-2 rounded-full"
+                      style={`background:${LANG_COLORS[it.language] ?? "var(--color-muted)"}`}
+                    />
+                    {it.language}
+                  </span>
+                )}
+              </span>
             </div>
           </article>
         ))
       }
     </div>
 
+    <p id="proj-note" class="mt-8 text-center font-mono text-xs text-faint">
+      + {archiveCount} more in the archive — tags, search, or <button type="button" id="proj-note-all" class="text-accent underline underline-offset-4 hover:text-accent-hover">show everything</button>
+    </p>
     <p id="proj-empty" class="mt-8 hidden text-sm text-muted">No projects match that filter.</p>
   </div>
 </BaseLayout>
@@ -197,35 +289,43 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
   const search = document.getElementById("proj-search") as HTMLInputElement | null;
   const grid = document.getElementById("proj-grid");
   const empty = document.getElementById("proj-empty");
+  const note = document.getElementById("proj-note");
   const cards = grid ? [...grid.querySelectorAll<HTMLElement>("[data-search]")] : [];
   const tagBtns = [...document.querySelectorAll<HTMLElement>(".proj-tag")];
-  const allBtn = document.querySelector<HTMLElement>('.proj-tag[data-tag=""]');
+  const highlightsBtn = document.querySelector<HTMLElement>('.proj-tag[data-tag=""]');
+  const everythingBtn = document.querySelector<HTMLElement>('.proj-tag[data-tag="*"]');
   const active = new Set<string>();
+  let showAll = false;
 
   const apply = () => {
     const q = (search?.value ?? "").trim().toLowerCase();
     const searchTerms = q ? q.split(/\s+/) : [];
+    // default (no tags, no query, not "everything") → highlights only
+    const featuredOnly = !showAll && active.size === 0 && searchTerms.length === 0;
     let visible = 0;
-    
+
     cards.forEach((c) => {
       const tags = (c.dataset.tags ?? "").split(" ").filter(Boolean);
       const okTag = active.size === 0 || [...active].every((t) => tags.includes(t));
       const searchStr = c.dataset.search ?? "";
-      const okText = searchTerms.length === 0 || searchTerms.every((term) => searchStr.includes(term));
-      
-      const show = okTag && okText;
+      const okText = searchTerms.length === 0 || searchTerms.every((t) => searchStr.includes(t));
+      const okFeatured = !featuredOnly || c.dataset.featured === "true";
+
+      const show = okTag && okText && okFeatured;
       c.style.display = show ? "" : "none";
       if (show) visible++;
     });
-    
+
+    note?.classList.toggle("hidden", !featuredOnly);
     empty?.classList.toggle("hidden", visible > 0);
   };
 
   const sync = () => {
-    allBtn?.classList.toggle("is-active", active.size === 0);
+    highlightsBtn?.classList.toggle("is-active", !showAll && active.size === 0);
+    everythingBtn?.classList.toggle("is-active", showAll);
     tagBtns.forEach((x) => {
       const t = x.dataset.tag ?? "";
-      if (t !== "") x.classList.toggle("is-active", active.has(t));
+      if (t !== "" && t !== "*") x.classList.toggle("is-active", active.has(t));
     });
   };
 
@@ -233,11 +333,26 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
   tagBtns.forEach((b) =>
     b.addEventListener("click", () => {
       const tag = b.dataset.tag ?? "";
-      if (tag === "") active.clear();
-      else if (active.has(tag)) active.delete(tag);
-      else active.add(tag);
+      if (tag === "") {
+        active.clear();
+        showAll = false;
+      } else if (tag === "*") {
+        active.clear();
+        showAll = true;
+      } else {
+        showAll = false;
+        active.has(tag) ? active.delete(tag) : active.add(tag);
+      }
       sync();
       apply();
     }),
   );
+  document.getElementById("proj-note-all")?.addEventListener("click", () => {
+    active.clear();
+    showAll = true;
+    sync();
+    apply();
+  });
+
+  apply();
 </script>
