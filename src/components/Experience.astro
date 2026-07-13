@@ -171,28 +171,29 @@ const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
     if (wasOpen) lastFocused?.focus();
   };
 
-  // cards/modals are swapped on navigation → re-bind per page load
-  const bind = () => {
-    document.querySelectorAll<HTMLElement>("[data-exp-open]").forEach((card) => {
-      card.addEventListener("click", (e) => {
-        // link chips inside the card navigate; everywhere else opens the modal
-        if ((e.target as Element).closest("a")) return;
-        open(card.dataset.expOpen!);
-      });
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          open(card.dataset.expOpen!);
-        }
-      });
-    });
-    document
-      .querySelectorAll<HTMLElement>("[data-close]")
-      .forEach((el) => el.addEventListener("click", closeAll));
-  };
+  // Fully delegated (document-level) so it works on any page load path —
+  // initial load, view-transition swap, or bfcache restore — with no re-binding.
+  document.addEventListener("click", (e) => {
+    const t = e.target as Element | null;
+    if (!t) return;
+    if (t.closest?.("[data-close]")) {
+      closeAll();
+      return;
+    }
+    const card = t.closest?.("[data-exp-open]") as HTMLElement | null;
+    // link chips inside the card navigate; everywhere else opens the modal
+    if (card && !t.closest("a")) open(card.dataset.expOpen!);
+  });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    if (e.key === "Escape") {
+      closeAll();
+      return;
+    }
+    const card = (e.target as Element | null)?.closest?.("[data-exp-open]") as HTMLElement | null;
+    if (card && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      open(card.dataset.expOpen!);
+    }
   });
-  document.addEventListener("astro:page-load", bind);
 </script>
