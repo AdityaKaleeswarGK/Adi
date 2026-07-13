@@ -35,7 +35,7 @@ const kindLabel: Record<string, string> = {
   ) : (
     <ol class="timeline relative ml-1 border-l border-border">
       {items.map((it) => (
-        <li class="timeline-item relative ml-4 pb-8 pl-6 last:pb-0">
+        <li class="timeline-item reveal relative ml-4 pb-8 pl-6 last:pb-0">
           <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
           <time class="font-mono text-xs text-faint">{fmt(it.data.date)}</time>
           <div class="mt-1 flex flex-wrap items-center gap-2">
@@ -69,20 +69,4 @@ const kindLabel: Record<string, string> = {
   )
 }
 
-<script>
-  // Subtle fade-up as each entry scrolls into view (items are visible by default).
-  const items = document.querySelectorAll<HTMLElement>(".timeline-item");
-  if (items.length && "IntersectionObserver" in window) {
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("animate-in");
-            io.unobserve(e.target);
-          }
-        }),
-      { threshold: 0.15 },
-    );
-    items.forEach((i) => io.observe(i));
-  }
-</script>
+<!-- scroll reveal comes from the shared .reveal handler in BaseLayout -->

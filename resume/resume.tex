@@ -1,0 +1,193 @@
+%-------------------------
+% Resume in LaTeX — Aditya Kaleeswar
+% Template: Jake Gutierrez (Jake's Resume), MIT License
+% Compile:  tectonic resume/resume.tex
+%------------------------
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.65in}
+\addtolength{\textheight}{1.4in}
+
+% Tighter bullet spacing (topsep left at default — the template's negative
+% \vspace values depend on it)
+\setlist[itemize]{itemsep=0pt, parsep=0pt}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-3pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}, itemsep=2pt, topsep=2pt]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-2pt}}
+
+%-------------------------------------------
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Aditya Kaleeswar} \\ \vspace{1pt}
+    \small +91 8438353880 $|$ \href{mailto:adityakaleeswargk04@gmail.com}{\underline{adityakaleeswargk04@gmail.com}} $|$
+    \href{https://www.linkedin.com/in/aditya-kaleeswar}{\underline{LinkedIn}} $|$
+    \href{https://github.com/AdityaKaleeswarGK}{\underline{GitHub}} $|$
+    \href{https://adi-kaleez.vercel.app}{\underline{Portfolio}}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Vellore Institute of Technology (VIT)}{Vellore, India}
+      {B.Tech in Computer Science --- CGPA: 8.41}{Sep 2022 -- Jul 2026}
+    \resumeSubheading
+      {Maharishi Vidya Mandir}{Chennai, India}
+      {Senior Secondary, CBSE --- Class XII: 96\%, Class X: 94\%}{Apr 2018 -- Jul 2022}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Research Intern}{Jan 2026 -- Jul 2026}
+      {University of Texas Rio Grande Valley (AIM Lab) --- Remote}{ECC: \href{https://drive.google.com/file/d/1jpN7zt1OlDj67Bmgxg9pDozC3m-_o7JR/view?usp=sharing}{\underline{Preprint}} / \href{https://github.com/AdityaKaleeswarGK/ECC-pipeline}{\underline{Code}} $\cdot$ PINN: \href{https://drive.google.com/file/d/1K7HPsfxgtqfvncoJHM7ELMVPqK_sShk_/view?usp=drive_link}{\underline{Preprint}} / \href{https://github.com/AdityaKaleeswarGK/PiNNBased_SHM}{\underline{Code}}}
+      \resumeItemListStart
+        \resumeItem{Built a CatBoost model predicting the strength and ductility of ECC, a bendable concrete, from its mix design}
+        \resumeItem{Added conformal prediction for calibrated uncertainty ranges --- $\sim$88\% observed coverage on 80\% intervals}
+        \resumeItem{Benchmarked against ET+GBR ensembles, NGBoost, LightGBM, TabPFN, and Mixture-of-Experts variants}
+        \resumeItem{Built an inverse-design pipeline: screens 100k candidate mixes for the cheapest one meeting a target strength, with out-of-distribution checks so recommendations stay within data the model trusts}
+        \resumeItem{Built a single image-to-verdict crack pipeline: a vision front end measures each crack's geometry, and a physics-informed neural network converts it to a structural severity verdict --- within 6.5\% of a finite-element reference}
+        \resumeItem{Made the vision front end pluggable: any YOLO segmentation model swaps in without touching the physics backend}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {PRISM Research Intern}{Oct 2024 -- Jun 2025}
+      {Samsung Research, Bangalore --- Remote}{\href{https://github.com/AdityaKaleeswarGK/Natural_Language_to_data_visualization}{\underline{Code}}}
+      \resumeItemListStart
+        \resumeItem{Built BQ2Viz, a multi-agent GenAI framework that turns natural-language questions into data visualizations}
+        \resumeItem{Chained three agents: a profiling agent summarizes the data, a reasoning planner infers which files and charts the query needs, and a code-generation agent writes and runs the plotting code}
+        \resumeItem{Achieved 84.57\% accuracy on the VisEval benchmark's complex multi-table queries, ahead of the NVAGENT baseline}
+        \resumeItem{Cut error rate to 11.5\% with a self-correcting loop that diagnoses and repairs failed chart code}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Software Engineer --- Autonomous Systems}{Apr 2024 -- Sep 2025}
+      {Team Vyadh (Mars Rover Team), VIT --- Vellore}{\href{https://github.com/TeamVyadhVIT/strawberry_cheesecake}{\underline{Rover stack}} $\cdot$ \href{https://github.com/AdityaKaleeswarGK/obstacle_pit_avoidance_using-pointcloud-process}{\underline{Obstacle avoidance}}}
+      \resumeItemListStart
+        \resumeItem{Built the rover's autonomous navigation stack on ROS 2 and Nav2, using frontier exploration to map unknown terrain within dynamic GPS geofences}
+        \resumeItem{Implemented real-time obstacle and pit avoidance from Intel RealSense depth point clouds, with path recovery and heading correction for wheel drift}
+        \resumeItem{Cut state-estimation noise by fusing IMU and wheel odometry in an Extended Kalman Filter; team placed 13th at IRC 2025 and 4th at IRDC 2025}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+
+      \resumeProjectHeading
+          {\textbf{HazMap --- Risk-Aware Exploration on an Autonomous Rover} $|$ \emph{ROS 2, Nav2, YOLOv8}}{\href{https://drive.google.com/file/d/1Uc-9NHbLMkmE7zuQGEXiru03pHrtng9c/view?usp=drive_link}{\underline{Preprint}} $\cdot$ \href{https://github.com/AdityaKaleeswarGK/hazpatrol}{\underline{Code}}}
+          \resumeItemListStart
+            \resumeItem{Designed HazMap, an exploration algorithm coupling gas sensing and vision: gas anomalies trigger close-up sweeps of suspected leaks, while visual hazard detections steer the rover away from danger}
+            \resumeItem{Built a coverage planner that inspects cluttered regions densely and skims open floor, cutting waypoints by $\sim$60\%}
+            \resumeItem{Localized gas sources to within 0.25 m and flagged the first hazards within 2\% of the mission --- validated in the GADEN gas-dispersion simulator (\href{https://github.com/AdityaKaleeswarGK/CGLS_gaden}{\underline{sim benchmark}}), then deployed on an NVIDIA Jetson rover running perception at $\sim$15 FPS}
+          \resumeItemListEnd
+
+      \vspace{6pt}
+      \resumeProjectHeading
+          {\textbf{Alpha Stack --- Natural Language to Production Codebases} $|$ \emph{Python, C++, Tree-sitter, TUI}}{\href{https://alpha-stack.vercel.app/docs}{\underline{Preprint}} $\cdot$ \href{https://github.com/HyperKuvid-Labs/alpha-stack}{\underline{Code}}}
+          \resumeItemListStart
+            \resumeItem{Built a terminal-based engine where an orchestrator agent turns a prompt into a software blueprint and parallel worker agents generate each file with inherited context, keeping the whole codebase mutually consistent}
+            \resumeItem{Wrote DGAT, a C++ dependency engine that parses imports across 12+ languages using Tree-sitter and re-analyzes only changed files --- keeping the project's dependency graph valid and cycle-free during generation}
+            \resumeItem{Added self-healing validation: builds and tests run in an isolated sandbox, and a diagnosis--repair agent pair fixes failures until the project converges}
+            \resumeItem{Created AlphaBench, a 40-task benchmark across CUDA, Go, Rust, and TypeScript, graded by real build-and-test execution instead of code matching}
+            \resumeItem{Benchmarked frontier models --- GPT-5.2, Gemini 3 Pro, Claude Opus, DeepSeek V3 --- showing the self-correction loop lifts project success from $\leq$45\% to 75\%}
+          \resumeItemListEnd
+
+    \resumeSubHeadingListEnd
+
+
+%-----------PATENT-----------
+\section{Patent}
+  \resumeSubHeadingListStart
+    \resumeProjectHeading
+        {\textbf{Force Sensor-Based Train Presence \& State Detection}}{Indian Patent App. No. 202641007500}
+        \resumeItemListStart
+          \resumeItem{Under-track force-sensor arrays and distributed ESP32 nodes running a finite-state machine passively classify a train's state --- approaching, stopped, pass-through, departing --- and its direction of entry, with no train-side equipment}
+        \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+
+%-----------TECHNICAL SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: Python, C/C++, JavaScript (ES6+), SQL (Postgres)} \\
+     \textbf{GenAI \& ML}{: PyTorch, LangGraph, LangChain, RAG, ChromaDB, CatBoost, Conformal Prediction, PINNs} \\
+     \textbf{Robotics \& Vision}{: ROS 2 (Nav2, SLAM Toolbox), OpenCV, PCL, YOLOv8, SAM, NVIDIA Jetson, ESP32} \\
+     \textbf{Web \& Data}{: React, Node.js, Express, MongoDB, REST APIs, pandas, NumPy, NetworkX, DuckDB} \\
+     \textbf{DevOps \& Cloud}{: GCP, Docker, Git, Linux}
+    }}
+ \end{itemize}
+
+
+%-------------------------------------------
+\end{document}

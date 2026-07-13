@@ -1,0 +1,120 @@
+---
+// Selected work on the home page — a hand-picked set of four, kept in sync by
+// hand (descriptions curated, not pulled from the GitHub API at runtime).
+// Full list lives at /projects.
+import GitHubIcon from "./GitHubIcon.astro";
+
+type Featured = {
+  title: string;
+  status: "working" | "done";
+  description: string;
+  tags: string[];
+  language: string;
+  link: string;
+};
+
+const featured: Featured[] = [
+  {
+    title: "alpha-stack",
+    status: "working",
+    description:
+      "Intelligent agent that converts natural language prompts into production-ready multi-file codebases with automatic dependency resolution, Docker validation, and iterative error correction.",
+    tags: ["agentic", "llm", "developer-tools"],
+    language: "python",
+    link: "https://github.com/HyperKuvid-Labs/alpha-stack",
+  },
+  {
+    title: "hazpatrol",
+    status: "done",
+    description:
+      "Autonomous coverage of unknown environments — a modified C* algorithm grows a Reachability Connectivity Graph as the map builds and drives boustrophedon laps until the full navigable area is covered.",
+    tags: ["robotics", "ros2", "path-planning"],
+    language: "python",
+    link: "https://github.com/AdityaKaleeswarGK/hazpatrol",
+  },
+  {
+    title: "ECC-pipeline",
+    status: "done",
+    description:
+      "End-to-end ML pipeline predicting the tensile properties of Engineered Cementitious Composites — with calibrated uncertainty via Mondrian Conformal Quantile Regression.",
+    tags: ["ml", "conformal"],
+    language: "jupyter-notebook",
+    link: "https://github.com/AdityaKaleeswarGK/ECC-pipeline",
+  },
+  {
+    title: "obstacle & pit avoidance",
+    status: "done",
+    description:
+      "Autonomous navigation from raw point clouds — real-time obstacle and negative-obstacle (pit) detection for mobile robots, built in C++ and Python.",
+    tags: ["robotics", "perception"],
+    language: "c++",
+    link: "https://github.com/AdityaKaleeswarGK/obstacle_pit_avoidance_using-pointcloud-process",
+  },
+];
+
+const LANG_COLORS: Record<string, string> = {
+  python: "#3572A5",
+  "c++": "#f34b7d",
+  "jupyter-notebook": "#DA5B0B",
+};
+---
+
+<section id="work">
+  <div class="mb-6 flex items-baseline justify-between">
+    <h2 class="text-lg font-semibold">Selected work</h2>
+    <a href="/projects" class="link-accent group inline-flex items-center gap-1 text-sm">
+      all projects <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+    </a>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    {
+      featured.map((it) => (
+        <article class="card-hover group reveal flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-mono text-[15px] font-semibold text-fg transition-colors group-hover:text-accent">{it.title}</h3>
+            {it.status === "done" ? (
+              <span class="tag shrink-0 border-done/50 text-done">
+                <span class="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-done" />
+                done
+              </span>
+            ) : (
+              <span class="tag shrink-0 border-working/50 text-working">
+                <span class="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-working" />
+                working
+              </span>
+            )}
+          </div>
+
+          <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted">{it.description}</p>
+
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {it.tags.map((t) => (
+              <span class="tag border-accent/25 text-[11px] text-accent/90">{t}</span>
+            ))}
+          </div>
+
+          <div class="mt-5 flex items-center justify-between border-t border-border pt-4 text-sm">
+            <a
+              href={it.link}
+              class="link-accent inline-flex items-center gap-1.5"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${it.title} on GitHub`}
+            >
+              <GitHubIcon class="h-4 w-4" />
+              Repo <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+            </a>
+            <span class="inline-flex items-center gap-1.5 text-xs text-faint">
+              <span
+                class="inline-block h-2 w-2 rounded-full"
+                style={`background:${LANG_COLORS[it.language] ?? "var(--color-muted)"}`}
+              />
+              {it.language}
+            </span>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>

@@ -2,7 +2,12 @@
 // ⌘K / Ctrl+K command palette — quick nav + actions from anywhere on the site.
 // Opens via keyboard shortcut, the nav hint button, or a custom "cmdk:open"
 // event. Fully keyboard driven: type to filter, ↑↓ to move, ↵ to run, Esc closes.
+import { getCollection } from "astro:content";
 import { nav, site } from "../site.config";
+
+// keep the palette in sync with the nav: hide Blog until a post exists
+const hasPosts = (await getCollection("blog", (p) => !p.data.draft)).length > 0;
+const navItems = nav.filter((n) => n.href !== "/blog" || hasPosts);
 
 type Item = {
   label: string;
@@ -22,7 +27,7 @@ const fileIcon =
   '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>';
 
 const items: Item[] = [
-  ...nav.map((n) => ({
+  ...navItems.map((n) => ({
     label: n.label === "Home" ? "Go home" : `Go to ${n.label.toLowerCase()}`,
     hint: n.href,
     action: "go" as const,
@@ -108,10 +113,14 @@ const items: Item[] = [
 </style>
 
 <script>
-  const root = document.getElementById("cmdk");
-  const input = document.getElementById("cmdk-input") as HTMLInputElement | null;
-  const empty = document.getElementById("cmdk-empty");
-  const items = [...document.querySelectorAll<HTMLElement>("[data-cmdk-item]")];
+  import { navigate } from "astro:transitions/client";
+
+  // The palette DOM is replaced on every view-transition swap, so element refs
+  // are re-bound on astro:page-load; document/window listeners register once.
+  let root: HTMLElement | null = null;
+  let input: HTMLInputElement | null = null;
+  let empty: HTMLElement | null = null;
+  let items: HTMLElement[] = [];
   let lastFocused: HTMLElement | null = null;
   let selected = 0;
 
@@ -167,7 +176,7 @@ const items: Item[] = [
     switch (item.dataset.action) {
       case "go":
         close();
-        window.location.href = value;
+        navigate(value);
         break;
       case "external":
         close();
@@ -218,19 +227,33 @@ const items: Item[] = [
     }
   });
 
-  input?.addEventListener("input", filter);
-  items.forEach((i) => {
-    i.addEventListener("click", () => run(i));
-    i.addEventListener("pointermove", () => {
-      const idx = visibleItems().indexOf(i);
-      if (idx >= 0 && idx !== selected) {
-        selected = idx;
-        paint();
-      }
+  const bind = () => {
+    root = document.getElementById("cmdk");
+    input = document.getElementById("cmdk-input") as HTMLInputElement | null;
+    empty = document.getElementById("cmdk-empty");
+    items = [...document.querySelectorAll<HTMLElement>("[data-cmdk-item]")];
+    selected = 0;
+
+    input?.addEventListener("input", filter);
+    items.forEach((i) => {
+      i.addEventListener("click", () => run(i));
+      i.addEventListener("pointermove", () => {
+        const idx = visibleItems().indexOf(i);
+        if (idx >= 0 && idx !== selected) {
+          selected = idx;
+          paint();
+        }
+      });
     });
-  });
-  document
-    .querySelectorAll("[data-cmdk-close]")
-    .forEach((el) => el.addEventListener("click", close));
+    document
+      .querySelectorAll("[data-cmdk-close]")
+      .forEach((el) => el.addEventListener("click", close));
+  };
+
   window.addEventListener("cmdk:open", open);
+  document.addEventListener("astro:page-load", bind);
+  // never leave the body scroll-locked mid-navigation
+  document.addEventListener("astro:before-swap", () => {
+    document.body.style.overflow = "";
+  });
 </script>

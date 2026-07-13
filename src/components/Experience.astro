@@ -25,7 +25,7 @@ const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
             <span class="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
 
             <div
-              class="exp-card card-hover cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
+              class="exp-card group card-hover reveal cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
               data-exp-open={i}
               tabindex="0"
               role="button"
@@ -67,7 +67,7 @@ const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
 
               <div class="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
                 <span class="text-faint">the full story, bullet by bullet</span>
-                <span class="link-accent font-medium">Expand →</span>
+                <span class="link-accent font-medium">Expand <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span></span>
               </div>
             </div>
           </li>
@@ -171,23 +171,28 @@ const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
     if (wasOpen) lastFocused?.focus();
   };
 
-  document.querySelectorAll<HTMLElement>("[data-exp-open]").forEach((card) => {
-    card.addEventListener("click", (e) => {
-      // link chips inside the card navigate; everywhere else opens the modal
-      if ((e.target as Element).closest("a")) return;
-      open(card.dataset.expOpen!);
-    });
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
+  // cards/modals are swapped on navigation → re-bind per page load
+  const bind = () => {
+    document.querySelectorAll<HTMLElement>("[data-exp-open]").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        // link chips inside the card navigate; everywhere else opens the modal
+        if ((e.target as Element).closest("a")) return;
         open(card.dataset.expOpen!);
-      }
+      });
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open(card.dataset.expOpen!);
+        }
+      });
     });
-  });
-  document
-    .querySelectorAll<HTMLElement>("[data-close]")
-    .forEach((el) => el.addEventListener("click", closeAll));
+    document
+      .querySelectorAll<HTMLElement>("[data-close]")
+      .forEach((el) => el.addEventListener("click", closeAll));
+  };
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAll();
   });
+  document.addEventListener("astro:page-load", bind);
 </script>

@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Exploring from "../components/Exploring.astro";
+import FeaturedProjects from "../components/FeaturedProjects.astro";
 import GitHubStats from "../components/GitHubStats.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 import { site } from "../site.config";
@@ -37,15 +38,30 @@ const latest = (await getCollection("exploring")).sort(
 
         <p class="mt-4 max-w-xl text-muted leading-relaxed">{site.intro}</p>
 
+        <div class="mt-8 flex items-center gap-3">
+          <a
+            href="/projects"
+            class="btn-magnetic inline-flex items-center gap-1.5 rounded-xl bg-accent px-5 py-2.5 text-sm font-medium text-[#06120d] transition-colors hover:bg-accent-hover"
+          >
+            View projects →
+          </a>
+          <a
+            href="/resume"
+            class="btn-magnetic inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-sm transition-colors hover:border-accent hover:text-accent"
+          >
+            Resume
+          </a>
+        </div>
+
         <!-- get in touch -->
-        <SocialLinks class="flex items-center gap-6 mt-8 text-muted" />
+        <SocialLinks class="flex items-center gap-6 mt-7 text-muted" />
       </div>
 
-      <!-- Hero image -->
+      <!-- Hero image (slightly dimmed so it doesn't outshine the intro text) -->
       <img
         src={site.heroImage}
         alt={site.name}
-        class="mx-auto aspect-square w-full max-w-md rounded-2xl border border-border object-cover md:max-w-none"
+        class="mx-auto aspect-square w-full max-w-md rounded-2xl border border-border object-cover brightness-[.94] saturate-[.92] md:max-w-none"
       />
     </section>
 
@@ -95,8 +111,11 @@ const latest = (await getCollection("exploring")).sort(
       </div>
     </section>
 
-    <!-- ── GitHub activity (dark graph), right under the profile ───────── -->
+    <!-- ── GitHub activity (contribution heatmap) ───────────────────────── -->
     <GitHubStats />
+
+    <!-- ── Selected work — the four flagship projects ───────────────────── -->
+    <FeaturedProjects />
 
     <!-- ── What I'm working on (Exploring) ───────────────────────────── -->
     <section id="exploring" class="scroll-mt-24">

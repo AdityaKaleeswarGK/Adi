@@ -1,5 +1,10 @@
 ---
+import { getCollection } from "astro:content";
 import { nav, site } from "../site.config";
+
+// hide the Blog item until there's at least one published post
+const hasPosts = (await getCollection("blog", (p) => !p.data.draft)).length > 0;
+const items = nav.filter((n) => n.href !== "/blog" || hasPosts);
 
 // active link: match exact for "/", prefix for the rest
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
@@ -16,12 +21,12 @@ const isActive = (href: string) =>
 
     <ul class="hidden md:flex items-center gap-1 text-sm">
       {
-        nav.map((item) => (
+        items.map((item) => (
           <li>
             <a
               href={item.href}
               class:list={[
-                "rounded-md px-3 py-1.5 transition-colors hover:text-fg",
+                "nav-link rounded-md px-3 py-1.5 transition-colors hover:text-fg",
                 isActive(item.href) ? "text-fg" : "text-muted",
               ]}
               aria-current={isActive(item.href) ? "page" : undefined}
@@ -32,13 +37,22 @@ const isActive = (href: string) =>
         ))
       }
     </ul>
+
+    <button
+      id="cmdk-hint"
+      type="button"
+      class="absolute right-5 hidden lg:inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted transition-colors hover:border-accent hover:text-accent"
+      aria-label="Open command palette"
+    >
+      ⌘K
+    </button>
   </nav>
 </header>
 
 <!-- Mobile Nav FAB -->
 <div class="md:hidden fixed bottom-6 right-6 z-50">
   <div id="mobile-menu" class="hidden absolute bottom-16 right-0 w-48 rounded-xl border border-border bg-surface p-2 shadow-xl flex-col gap-1">
-    {nav.map(item => (
+    {items.map(item => (
       <a href={item.href} class:list={[
         "rounded-md border border-transparent px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:text-accent hover:bg-surface-2",
         isActive(item.href) ? "text-fg bg-surface-2" : "text-muted"
@@ -60,31 +74,34 @@ const isActive = (href: string) =>
 </div>
 
 <script>
-  const btn = document.getElementById('mobile-menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  const menuIcon = btn?.querySelector('.menu-icon');
-  const closeIcon = btn?.querySelector('.close-icon');
-
+  // Fully delegated (no element-bound listeners), so it survives view-transition
+  // swaps without re-binding.
   const setOpen = (open: boolean) => {
-    menu?.classList.toggle('hidden', !open);
-    menu?.classList.toggle('flex', open);
-    menuIcon?.classList.toggle('hidden', open);
-    closeIcon?.classList.toggle('hidden', !open);
-    btn?.setAttribute('aria-expanded', String(open));
-    btn?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    const menu = document.getElementById("mobile-menu");
+    const btn = document.getElementById("mobile-menu-btn");
+    menu?.classList.toggle("hidden", !open);
+    menu?.classList.toggle("flex", open);
+    btn?.querySelector(".menu-icon")?.classList.toggle("hidden", open);
+    btn?.querySelector(".close-icon")?.classList.toggle("hidden", !open);
+    btn?.setAttribute("aria-expanded", String(open));
+    btn?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
   };
 
-  btn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    setOpen(Boolean(menu?.classList.contains('hidden')));
-  });
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
 
-  // Close when clicking outside
-  document.addEventListener('click', (e) => {
-    if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target as Node)) {
+    if (target?.closest?.("#cmdk-hint")) {
+      window.dispatchEvent(new CustomEvent("cmdk:open"));
+      return;
+    }
+
+    const menu = document.getElementById("mobile-menu");
+    if (!menu) return;
+    const isOpen = !menu.classList.contains("hidden");
+    if (target?.closest?.("#mobile-menu-btn")) {
+      setOpen(!isOpen);
+    } else if (isOpen && !menu.contains(target as Node)) {
       setOpen(false);
     }
   });
-
-
 </script>

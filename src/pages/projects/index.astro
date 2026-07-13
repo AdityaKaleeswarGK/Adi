@@ -251,7 +251,7 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
       {
         items.map((it) => (
           <article
-            class="card-hover group flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
+            class="card-hover group reveal flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
             data-featured={it.featured ? "true" : undefined}
             data-tags={it.tags.join(" ")}
             data-search={`${it.title} ${it.description} ${it.tags.join(" ")}`.toLowerCase()}
@@ -286,7 +286,7 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
                 aria-label={`${it.title} on GitHub`}
               >
                 <GitHubIcon class="h-4 w-4" />
-                Repo →
+                Repo <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span>
               </a>
               <span class="flex items-center gap-3 text-xs text-faint">
                 {it.stars > 0 && <span>★ {it.stars}</span>}
@@ -314,6 +314,8 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
 </BaseLayout>
 
 <script>
+  // re-runs per page load (view transitions swap the DOM)
+  document.addEventListener("astro:page-load", () => {
   const search = document.getElementById("proj-search") as HTMLInputElement | null;
   const grid = document.getElementById("proj-grid");
   const empty = document.getElementById("proj-empty");
@@ -383,4 +385,5 @@ const allTags = [...tagCounts.keys()].sort((a, b) => {
   });
 
   apply();
+  });
 </script>

@@ -39,8 +39,9 @@ const readMins = Math.max(1, Math.round((post.body ?? "").split(/\s+/).length / 
 
 <script>
   // accent progress bar across the top while reading
-  const bar = document.querySelector<HTMLElement>(".scroll-progress");
+  // (bar is looked up per call — the element is swapped on each navigation)
   const update = () => {
+    const bar = document.querySelector<HTMLElement>(".scroll-progress");
     if (!bar) return;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     bar.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;

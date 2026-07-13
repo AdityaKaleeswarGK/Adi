@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* self-hosted variable fonts (no Google Fonts round-trip) */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
 
 /* ───────────────────────────────────────────────────────────────────────────
    DARK THEME TOKENS
@@ -20,8 +23,8 @@
   --color-done: #eab308;        /* "done" project status (yellow) */
   --color-working: #10b981;     /* "working" project status (matches accent) */
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────────── */
@@ -46,6 +49,41 @@ body {
 }
 
 a { color: inherit; text-decoration: none; }
+
+/* ─── Film-grain overlay — barely-there texture over everything ─────────────── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/png;base64,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");
+  background-repeat: repeat;
+}
+
+/* ─── Page-enter: content pops up on every navigation (main is swapped) ─────── */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+main { animation: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ─── Top loading bar while the next page is being fetched ──────────────────── */
+@keyframes loading-bar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(0.85); }
+}
+html.is-loading::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 200;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
+  transform-origin: left;
+  animation: loading-bar 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
 
 ::selection { background: var(--color-accent); color: #06120d; }
 
@@ -156,13 +194,66 @@ a { color: inherit; text-decoration: none; }
 }
 .exp-modal.flex .exp-panel { animation: exp-pop-in 0.2s ease-out; }
 
-/* ─── Exploring timeline reveal ──────────────────────────────────────────────── */
+/* ─── Scroll reveal (.reveal on any element; BaseLayout adds .animate-in) ────── */
 /* slide only (no opacity) so content is never left hidden if the animation pauses */
 @keyframes rise {
   from { transform: translateY(14px); }
   to   { transform: none; }
 }
-.timeline-item.animate-in { animation: rise 0.5s ease-out; }
+.reveal.animate-in {
+  animation: rise 0.5s ease-out both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* ─── Nav link underline — slides in on hover, stays on the active page ──────── */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.3rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+
+/* ─── Magnetic buttons — JS in BaseLayout nudges them toward the cursor ──────── */
+.btn-magnetic {
+  transition: transform 0.25s cubic-bezier(0.3, 1, 0.4, 1);
+  will-change: transform;
+}
+
+/* ─── GitHub contribution heatmap ────────────────────────────────────────────── */
+.heatmap { display: flex; gap: 3px; }
+.heat-week { display: flex; flex: 1 1 0%; min-width: 0; flex-direction: column; gap: 3px; }
+.heat-months { display: flex; gap: 3px; margin-bottom: 6px; }
+.heat-months span {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: visible;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-faint);
+}
+.heat-cell {
+  aspect-ratio: 1;
+  width: 100%;
+  min-width: 0;
+  border-radius: 2px;
+  background: var(--color-surface-2);
+}
+.heat-cell:hover { outline: 1px solid var(--color-muted); outline-offset: 0; }
+.heat-1 { background: color-mix(in oklab, var(--color-accent) 30%, var(--color-surface-2)); }
+.heat-2 { background: color-mix(in oklab, var(--color-accent) 55%, var(--color-surface-2)); }
+.heat-3 { background: color-mix(in oklab, var(--color-accent) 80%, var(--color-surface-2)); }
+.heat-4 { background: var(--color-accent-hover); }
 
 /* ─── Projects tag filter chips (bigger, multi-select) ───────────────────────── */
 .proj-tag {
