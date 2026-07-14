@@ -187,12 +187,24 @@ html.is-loading::before {
   pointer-events: none;
 }
 
-/* ─── Experience modal pop-in ───────────────────────────────────────────────── */
+/* ─── Pop-in keyframe (command palette panel) ───────────────────────────────── */
 @keyframes exp-pop-in {
   from { opacity: 0; transform: translateY(8px) scale(0.97); }
   to   { opacity: 1; transform: none; }
 }
-.exp-modal.flex .exp-panel { animation: exp-pop-in 0.2s ease-out; }
+
+/* ─── Experience inline accordion (expand/collapse in the timeline card) ────── */
+.exp-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.exp-body-clip { overflow: hidden; min-height: 0; }
+.exp-card.is-open .exp-body { grid-template-rows: 1fr; }
+.exp-card .exp-less { display: none; }
+.exp-card.is-open .exp-less { display: inline; }
+.exp-card.is-open .exp-more { display: none; }
+.exp-card.is-open .exp-caret { transform: rotate(180deg); }
 
 /* ─── Scroll reveal (.reveal on any element; BaseLayout adds .animate-in) ────── */
 /* slide only (no opacity) so content is never left hidden if the animation pauses */
@@ -271,10 +283,10 @@ html.is-loading::before {
   display: block;
 }
 
-/* ─── Clean accent-dot bullets inside the experience modal ───────────────────── */
-.exp-panel .prose ul { list-style: none; padding-left: 0; margin: 0; }
-.exp-panel .prose li { position: relative; padding-left: 1.35rem; }
-.exp-panel .prose li::before {
+/* ─── Clean accent-dot bullets inside the expanded experience story ──────────── */
+.exp-panel.prose ul { list-style: none; padding-left: 0; margin: 0; }
+.exp-panel.prose li { position: relative; padding-left: 1.35rem; }
+.exp-panel.prose li::before {
   content: "";
   position: absolute;
   left: 2px;
@@ -284,4 +296,4 @@ html.is-loading::before {
   border-radius: 9999px;
   background: var(--color-accent);
 }
-.exp-panel .prose li + li { margin-top: 0.7em; }
+.exp-panel.prose li + li { margin-top: 0.7em; }

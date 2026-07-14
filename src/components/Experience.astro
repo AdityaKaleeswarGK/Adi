@@ -1,7 +1,7 @@
 ---
 // Experience: a vertical timeline of roles. Each card shows the role, summary
-// and its projects/preprints as link chips; clicking anywhere else on the card
-// opens a large modal with the full story. Content: src/content/experience/.
+// and its projects/preprints as link chips; clicking the card expands the full
+// story inline (accordion — no modal). Content: src/content/experience/.
 import { getCollection, render } from "astro:content";
 import GitHubIcon from "./GitHubIcon.astro";
 
@@ -20,180 +20,118 @@ const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
   items.length > 0 && (
     <section id="experience">
       <ol class="relative ml-1 border-l border-border">
-        {items.map((it, i) => (
-          <li class="relative ml-4 pb-8 pl-6 last:pb-0">
-            <span class="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
+        {items.map((it, i) => {
+          const Body = it.Content;
+          return (
+            <li class="relative ml-4 pb-8 pl-6 last:pb-0">
+              <span class="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
 
-            <div
-              class="exp-card group card-hover reveal cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-0.5"
-              data-exp-open={i}
-              tabindex="0"
-              role="button"
-              aria-haspopup="dialog"
-              aria-label={`${it.data.role} at ${it.data.org} — open details`}
-            >
-              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 class="text-lg font-semibold text-fg">{it.data.role}</h3>
-                <time class="font-mono text-xs text-accent">{it.data.start} – {it.data.end}</time>
-              </div>
-              <p class="mt-0.5 text-sm text-muted">
-                {it.data.org}
-                {it.data.location ? ` · ${it.data.location}` : ""}
-              </p>
-
-              {it.data.summary && (
-                <p class="mt-3 text-sm leading-relaxed text-faint">{it.data.summary}</p>
-              )}
-
-              {it.data.links.length > 0 && (
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {it.data.links.map((l) => (
-                    <a
-                      href={l.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
-                    >
-                      {isPaper(l.label) ? (
-                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                      ) : (
-                        <GitHubIcon class="h-3.5 w-3.5" />
-                      )}
-                      {l.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              <div class="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
-                <span class="text-faint">the full story, bullet by bullet</span>
-                <span class="link-accent font-medium">Expand <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span></span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      {/* Modals (one per role) */}
-      {items.map((it, i) => {
-        const Body = it.Content;
-        return (
-          <div
-            class="exp-modal fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6"
-            data-exp={i}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${it.data.role} — ${it.data.org}`}
-          >
-            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close />
-            <div class="exp-panel relative z-10 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-border bg-surface p-8 shadow-2xl sm:p-10">
-              <button
-                type="button"
-                class="absolute right-4 top-4 text-2xl leading-none text-faint transition-colors hover:text-fg"
-                data-close
-                aria-label="Close"
+              <article
+                class="exp-card group card-hover reveal cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200"
+                data-exp-toggle
+                tabindex="0"
+                role="button"
+                aria-expanded="false"
+                aria-controls={`exp-body-${i}`}
+                aria-label={`${it.data.role} at ${it.data.org} — toggle details`}
               >
-                ×
-              </button>
-              <p class="font-mono text-xs text-accent">{it.data.start} – {it.data.end}</p>
-              <h3 class="mt-1 text-3xl font-bold tracking-tight">{it.data.role}</h3>
-              <p class="mt-1 text-muted">
-                {it.data.org}
-                {it.data.location ? ` · ${it.data.location}` : ""}
-              </p>
-
-              {it.data.milestones.length > 0 && (
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {it.data.milestones.map((m) => (
-                    <span
-                      class:list={[
-                        "tag text-xs",
-                        m.promotion ? "border-accent/50 text-accent" : "",
-                      ]}
-                    >
-                      <span class="mr-1.5 font-mono text-[10px] text-faint">{m.date}</span>
-                      {m.label}
-                      {m.promotion && " ↑"}
-                    </span>
-                  ))}
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <h3 class="text-lg font-semibold text-fg">{it.data.role}</h3>
+                  <time class="font-mono text-xs text-accent">{it.data.start} – {it.data.end}</time>
                 </div>
-              )}
+                <p class="mt-0.5 text-sm text-muted">
+                  {it.data.org}
+                  {it.data.location ? ` · ${it.data.location}` : ""}
+                </p>
 
-              <div class="prose mt-6">
-                <Body />
-              </div>
-              {it.data.links.length > 0 && (
-                <div class="mt-6 flex flex-wrap gap-x-5 gap-y-2 border-t border-border pt-5">
-                  {it.data.links.map((l) => (
-                    <a
-                      href={l.url}
-                      class="link-accent inline-flex items-center gap-1.5 text-sm"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {isPaper(l.label) ? (
-                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                      ) : (
-                        <GitHubIcon class="h-3.5 w-3.5" />
-                      )}
-                      {l.label}
-                    </a>
-                  ))}
+                {it.data.summary && (
+                  <p class="mt-3 text-sm leading-relaxed text-faint">{it.data.summary}</p>
+                )}
+
+                {it.data.links.length > 0 && (
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    {it.data.links.map((l) => (
+                      <a
+                        href={l.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+                      >
+                        {isPaper(l.label) ? (
+                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                        ) : (
+                          <GitHubIcon class="h-3.5 w-3.5" />
+                        )}
+                        {l.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <div class="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
+                  <span class="text-faint">the full story, bullet by bullet</span>
+                  <span class="link-accent inline-flex items-center gap-1.5 font-medium">
+                    <span class="exp-more">Expand</span>
+                    <span class="exp-less">Collapse</span>
+                    <svg class="exp-caret h-3.5 w-3.5 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  </span>
                 </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+
+                {/* inline expandable story (animated via grid-template-rows) */}
+                <div id={`exp-body-${i}`} class="exp-body">
+                  <div class="exp-body-clip">
+                    {it.data.milestones.length > 0 && (
+                      <div class="mt-5 flex flex-wrap gap-2">
+                        {it.data.milestones.map((m) => (
+                          <span
+                            class:list={[
+                              "tag text-xs",
+                              m.promotion ? "border-accent/50 text-accent" : "",
+                            ]}
+                          >
+                            <span class="mr-1.5 font-mono text-[10px] text-faint">{m.date}</span>
+                            {m.label}
+                            {m.promotion && " ↑"}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div class="exp-panel prose mt-5">
+                      <Body />
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   )
 }
 
 <script>
-  let lastFocused: HTMLElement | null = null;
-
-  const open = (i: string) => {
-    const m = document.querySelector<HTMLElement>(`.exp-modal[data-exp="${i}"]`);
-    if (!m) return;
-    lastFocused = document.activeElement as HTMLElement;
-    m.classList.remove("hidden");
-    m.classList.add("flex");
-    document.body.style.overflow = "hidden";
-    m.querySelector<HTMLElement>("[data-close][aria-label]")?.focus();
-  };
-  const closeAll = () => {
-    const wasOpen = document.querySelector(".exp-modal.flex");
-    document.querySelectorAll<HTMLElement>(".exp-modal").forEach((m) => {
-      m.classList.add("hidden");
-      m.classList.remove("flex");
-    });
-    document.body.style.overflow = "";
-    if (wasOpen) lastFocused?.focus();
-  };
-
-  // Fully delegated (document-level) so it works on any page load path —
+  // Fully delegated (document-level) so it works on any load path —
   // initial load, view-transition swap, or bfcache restore — with no re-binding.
+  function toggle(card: HTMLElement) {
+    const open = card.classList.toggle("is-open");
+    card.setAttribute("aria-expanded", String(open));
+  }
+
   document.addEventListener("click", (e) => {
     const t = e.target as Element | null;
-    if (!t) return;
-    if (t.closest?.("[data-close]")) {
-      closeAll();
-      return;
-    }
-    const card = t.closest?.("[data-exp-open]") as HTMLElement | null;
-    // link chips inside the card navigate; everywhere else opens the modal
-    if (card && !t.closest("a")) open(card.dataset.expOpen!);
+    // links navigate; clicks inside the opened story are for reading, not toggling
+    if (!t || t.closest?.("a") || t.closest?.(".exp-body")) return;
+    const card = t.closest?.("[data-exp-toggle]") as HTMLElement | null;
+    if (card) toggle(card);
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeAll();
-      return;
-    }
-    const card = (e.target as Element | null)?.closest?.("[data-exp-open]") as HTMLElement | null;
-    if (card && (e.key === "Enter" || e.key === " ")) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const card = (e.target as Element | null)?.closest?.("[data-exp-toggle]") as HTMLElement | null;
+    if (card && e.target === card) {
       e.preventDefault();
-      open(card.dataset.expOpen!);
+      toggle(card);
     }
   });
 </script>
