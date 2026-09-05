@@ -29,7 +29,7 @@ export const site = {
     github: "https://github.com/AdityaKaleeswarGK",
     email: "adityakaleeswargk04@gmail.com",
     twitter: "https://x.com/AdityaKaleeswar",
-    linkedin: "https://www.linkedin.com/in/aditya-kaleeswar",
+    linkedin: "https://www.linkedin.com/in/aditya-kaleeswar-gk",
   },
 } as const;
 

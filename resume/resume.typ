@@ -59,7 +59,7 @@
   #v(-6pt)
   #link("mailto:adityakaleeswargk04@gmail.com")[adityakaleeswargk04\@gmail.com]
   #h(4pt) | #h(4pt)
-  #link("https://www.linkedin.com/in/aditya-kaleeswar")[LinkedIn]
+  #link("https://www.linkedin.com/in/aditya-kaleeswar-gk")[LinkedIn]
   #h(4pt) | #h(4pt)
   #link("https://github.com/AdityaKaleeswarGK")[GitHub]
   #h(4pt) | #h(4pt)

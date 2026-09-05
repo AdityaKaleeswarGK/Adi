@@ -1,5 +1,5 @@
 ---
-role: "Research Intern"
+role: "Research Intern under the PRISM Program"
 org: "Samsung Research, Bangalore"
 location: "Remote"
 start: "Oct 2024"

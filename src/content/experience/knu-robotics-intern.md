@@ -1,6 +1,6 @@
 ---
-role: "Robotics Intern"
-org: "Kyungpook National University (KNU) — PIAI Lab × VIT Vellore"
+role: "Robotics Research Intern"
+org: "Department of Robotics, KNU × VIT Vellore"
 location: "Remote / Vellore"
 start: "Aug 2025"
 end: "Jan 2026"
