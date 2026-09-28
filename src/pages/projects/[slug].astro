@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import WorkArt from "../../components/WorkArt.astro";
+import {getCollection} from "astro:content";
+import {work} from "../../data/work";
+export function getStaticPaths(){return work.map(item=>({params:{slug:item.slug},props:{item}}));}
+const {item}=Astro.props;
+const article=(await getCollection("blog", p=>!p.data.draft && p.data.date<=new Date() && p.data.project===item.slug))[0];
+---
+<BaseLayout title={item.title} description={item.description}>
+<article class="container-tight project-story">
+<a class="text-link" href="/projects">← Selected work</a>
+<header class="page-intro"><p class="eyebrow">{item.field}</p><h1>{item.title}</h1><p>{item.subtitle}</p><small>{item.context}</small></header>
+<WorkArt kind={item.art}/><p class="figure-caption">Conceptual illustration · not experimental data</p>
+<div class="project-links">{item.links.map(link=><a class="text-link" href={link.url} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}</div>
+<div class="contribution"><p class="eyebrow">My contribution</p><p>{item.contribution}</p></div>
+<div class="prose">{item.sections.map(section=><section><h2>{section.title}</h2><p>{section.text}</p></section>)}</div>
+<p class="source-note">For implementation and research details, explore the linked repositories and preprints.</p>
+<aside class="writing-callout"><p class="eyebrow">From the notebook</p><h2>{article ? article.data.title : "A longer write-up is on the way."}</h2><p>{article ? article.data.description : "I’m preparing a closer look at the design, experiments, and lessons behind this project."}</p><a class="text-link" href={article ? (article.data.url ?? `/blog/${article.id}`) : "/blog"}>{article ? "Read the story →" : "Writing & research notes →"}</a></aside>
+</article>
+</BaseLayout>

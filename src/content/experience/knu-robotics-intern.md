@@ -7,7 +7,7 @@ end: "Jan 2026"
 summary: "Coverage-planning & gas-source localization for autonomous robots, under Dr. Yuvaraj."
 order: 2
 links:
-  - { label: "HazMap (preprint)", url: "https://drive.google.com/file/d/1Uc-9NHbLMkmE7zuQGEXiru03pHrtng9c/view?usp=drive_link" }
+  - { label: "CRAFT / HazMap (preprint)", url: "https://drive.google.com/file/d/1Uc-9NHbLMkmE7zuQGEXiru03pHrtng9c/view?usp=drive_link" }
   - { label: "HazPatrol (repo)", url: "https://github.com/AdityaKaleeswarGK/hazpatrol" }
   - { label: "Gas-source localization (repo)", url: "https://github.com/AdityaKaleeswarGK/CGLS_gaden" }
 ---

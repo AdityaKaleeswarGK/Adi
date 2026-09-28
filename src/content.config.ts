@@ -19,6 +19,7 @@ const blog = defineCollection({
     description: z.string().optional(),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
+    project: z.string().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
     url: z.string().url().optional(),
@@ -51,22 +52,6 @@ const exploring = defineCollection({
   }),
 });
 
-// ─── Projects ───────────────────────────────────────────────────────────────
-const projects = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    repo: z.string().url().optional(),
-    demo: z.string().url().optional(),
-    tags: z.array(z.string()).default([]),
-    featured: z.boolean().default(false),
-    order: z.number().default(99),
-    // optional manual override — otherwise derived from the repo's last commit
-    status: z.enum(["working", "done"]).optional(),
-  }),
-});
-
 // ─── Experience ─────────────────────────────────────────────────────────────
 const experience = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/experience" }),
@@ -94,4 +79,4 @@ const experience = defineCollection({
   }),
 });
 
-export const collections = { blog, exploring, projects, experience };
+export const collections = { blog, exploring, experience };

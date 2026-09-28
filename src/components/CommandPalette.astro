@@ -5,9 +5,7 @@
 import { getCollection } from "astro:content";
 import { nav, site } from "../site.config";
 
-// keep the palette in sync with the nav: hide Blog until a post exists
-const hasPosts = (await getCollection("blog", (p) => !p.data.draft)).length > 0;
-const navItems = nav.filter((n) => n.href !== "/blog" || hasPosts);
+const navItems = nav;
 
 type Item = {
   label: string;
@@ -251,7 +249,11 @@ const items: Item[] = [
   };
 
   window.addEventListener("cmdk:open", open);
+  document.addEventListener("click", (event) => {
+    if ((event.target as Element | null)?.closest("#cmdk-hint")) open();
+  });
   document.addEventListener("astro:page-load", bind);
+  bind();
   // never leave the body scroll-locked mid-navigation
   document.addEventListener("astro:before-swap", () => {
     document.body.style.overflow = "";

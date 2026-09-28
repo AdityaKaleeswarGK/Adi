@@ -1,0 +1,31 @@
+---
+const {kind} = Astro.props;
+---
+<div class:list={["work-art", `art-${kind}`]} aria-hidden="true">
+  <svg viewBox="0 0 520 260" fill="none">
+    {kind === 'alpha' && <>
+      <path d="M115 130H195M295 130H405M245 80V45H405V100M405 160V215H245V180" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <rect x="40" y="98" width="100" height="64" rx="6" fill="var(--art-paper)" stroke="currentColor"/><text x="90" y="136" text-anchor="middle">request</text>
+      <rect x="190" y="80" width="110" height="100" rx="6" fill="var(--art-paper)" stroke="currentColor"/><text x="245" y="125" text-anchor="middle">plan</text><text x="245" y="145" text-anchor="middle">+ generate</text>
+      <rect x="355" y="100" width="110" height="60" rx="6" fill="var(--art-paper)" stroke="currentColor"/><text x="410" y="135" text-anchor="middle">build / test</text><text x="315" y="235" text-anchor="middle">repair ↵</text>
+    </>}
+    {kind === 'craft' && <>
+      <path d="M55 35H465V225H55ZM155 35V95H265V35M155 225V155H265V225M355 85V180H465" stroke="currentColor" stroke-width="3" opacity=".45"/>
+      <path d="M80 190V60H125V195H190V125H310V60H435V110H385V150H320V205H440" stroke="currentColor" stroke-width="2" stroke-dasharray="6 5"/>
+      <circle cx="320" cy="125" r="39" fill="currentColor" opacity=".09"/><circle cx="320" cy="125" r="22" stroke="currentColor"/><circle cx="320" cy="125" r="5" fill="currentColor"/><circle cx="80" cy="190" r="9" fill="var(--art-paper)" stroke="currentColor" stroke-width="2"/>
+      <text x="300" y="250">coverage → local sweep</text>
+    </>}
+    {kind === 'ecc' && <>
+      <path d="M65 35V218H465" stroke="currentColor" opacity=".5"/>
+      <path d="M80 180C140 150 160 90 230 110S355 75 455 40V108C355 130 300 170 230 162S140 208 80 210Z" fill="currentColor" opacity=".13"/>
+      <path d="M80 195C140 179 160 121 230 137S355 102 455 74" stroke="currentColor" stroke-width="2"/>
+      {[ [110,182],[155,158],[200,128],[250,145],[300,129],[350,99],[405,97],[440,68] ].map(([cx,cy])=><circle cx={cx} cy={cy} r="4" fill="currentColor"/>)}
+      <text x="82" y="55">prediction + interval</text><text x="323" y="245">conceptual illustration</text>
+    </>}
+    {kind === 'pinn' && <>
+      {[24,48,72,96,120].map(r=><ellipse cx="290" cy="130" rx={r*1.35} ry={r*.85} stroke="currentColor" opacity={.7-r/220}/>)}
+      <path d="M50 130H200L225 114L245 137L270 121L290 130" stroke="var(--art-paper)" stroke-width="12"/><path d="M50 130H200L225 114L245 137L270 121L290 130" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="290" cy="130" r="4" fill="currentColor"/><path d="M296 124L350 55H450" stroke="currentColor"/><text x="360" y="45">crack-tip field</text><text x="65" y="235">image → geometry → mechanics</text>
+    </>}
+  </svg>
+</div>

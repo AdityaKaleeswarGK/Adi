@@ -8,7 +8,7 @@ const downloadName = `${site.name.replace(/\s+/g, "_")}_Resume.pdf`;
 
 <section id="resume">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-    <h2 class="text-lg font-semibold">Résumé</h2>
+    <h1 class="text-4xl font-normal" style="font-family:Georgia,serif">Résumé</h1>
     <div class="flex gap-3">
       <a
         href={site.resumeUrl}
@@ -21,7 +21,7 @@ const downloadName = `${site.name.replace(/\s+/g, "_")}_Resume.pdf`;
       <a
         href={site.resumeUrl}
         download={downloadName}
-        class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-[#06120d] transition-colors hover:bg-accent-hover"
+        class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
       >
         Download PDF ↓
       </a>

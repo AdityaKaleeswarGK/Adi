@@ -9,10 +9,10 @@ export const site = {
   // Shown in the browser tab + footer.
   title: "Aditya Kaleeswar",
   // One-liner under your name on the homepage hero.
-  tagline: "CS @ VIT Vellore. Building robots, physics-informed ML, and LLM agents.",
+  tagline: "Computer science graduate exploring robotics, machine learning, and language models.",
   // A slightly longer intro used on the homepage / about.
   intro:
-    "I'm a CS student at VIT Vellore who just likes building — autonomous robots, ML pipelines with honest uncertainty, and agentic tooling. This site is my home base: projects, notes, and a running log of the papers I'm reading.",
+    "I’m Aditya, a computer science graduate exploring robotics, machine learning, and language models. A researcher at heart, driven by building.",
 
   // Path to your résumé PDF (lives in /public). To update it, just replace
   // the file at public/resume.pdf — no code change needed.
@@ -39,5 +39,5 @@ export const nav = [
   { label: "Projects", href: "/projects" },
   { label: "Experience", href: "/experience" },
   { label: "Resume", href: "/resume" },
-  { label: "Blog", href: "/blog" },
+  { label: "Writing", href: "/blog" },
 ] as const;
