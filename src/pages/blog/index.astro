@@ -5,9 +5,9 @@ const posts=(await getCollection('blog',p=>!p.data.draft && p.data.date<=new Dat
 const upcoming=(await getCollection('blog',p=>p.data.draft || p.data.date>new Date())).sort((a,b)=>+a.data.date-+b.data.date);
 ---
 <BaseLayout title="Writing" description="Research notes, project stories, and experiments from Aditya Kaleeswar.">
-<div class="container-tight"><header class="page-intro"><p class="eyebrow">The notebook</p><h1>Ideas in progress.</h1><p>Longer stories about the systems I build, the papers I read, and the questions that stay with me.</p></header>
+<div class="container-tight"><header class="page-intro"><p class="eyebrow">Blog</p><h1>Writing</h1><p>Project write-ups and research notes.</p></header>
 {posts.length>0 && <section aria-label="Published writing">{posts.map(p=><a class="notebook-row" href={p.data.url??`/blog/${p.id}`}><span class="eyebrow">{p.data.date.toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</span><div><h2>{p.data.title}</h2><p class="mt-2 text-sm text-muted">{p.data.description}</p></div><span>↗</span></a>)}</section>}
-<section class="writing-callout"><p class="eyebrow">On the writing desk</p><h2>{posts.length?'Coming next.':'The first stories are taking shape.'}</h2><p>These longer write-ups are in preparation. In the meantime, each project has a short overview with contributions, results, and source links.</p></section>
+<section class="writing-callout"><p class="eyebrow">Planned posts</p><h2>{posts.length?'Coming next.':'Posts in preparation'}</h2><p>These longer write-ups are in preparation. In the meantime, each project has a short overview with contributions, results, and source links.</p></section>
 <div class="mt-8">{upcoming.map((post,i)=><a href={post.data.project ? `/projects/${post.data.project}` : "/now"} class="notebook-row"><span>0{i+1}</span><div><p class="eyebrow">Planned write-up</p><h3>{post.data.title}</h3><p class="mt-2 text-xs text-muted">Read the project overview ↗</p></div></a>)}</div>
-<aside class="archive-link"><p class="text-sm text-muted">Smaller updates from the workbench.</p><a class="text-link" href="/now">What I’m doing now →</a></aside></div>
+<aside class="archive-link"><p class="text-sm text-muted">Project updates.</p><a class="text-link" href="/now">What I’m doing now →</a></aside></div>
 </BaseLayout>

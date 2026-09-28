@@ -2,46 +2,33 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import FeaturedProjects from "../components/FeaturedProjects.astro";
 import { site } from "../site.config";
-import { getCollection } from "astro:content";
-const posts = (await getCollection('blog', p => !p.data.draft && p.data.date <= new Date())).sort((a,b)=>+b.data.date-+a.data.date).slice(0,3);
 ---
 <BaseLayout>
   <div class="container-wide">
     <section class="intro-layout">
       <div class="intro-copy">
         <p class="eyebrow intro-kicker">Robotics · Machine learning · Language models</p>
-        <h1>Research<br/>through <em>building.</em></h1>
-        <p class="intro-text">I’m Aditya, a computer science graduate exploring robotics, machine learning, and language models.</p>
-        <p class="intro-personal">A researcher at heart, driven by building.</p>
+        <h1>Hi, I’m Aditya.</h1>
+        <svg class="portrait-arrow" viewBox="0 0 210 120" fill="none" aria-hidden="true"><path d="M8 85C55 108 109 93 103 55C98 25 65 41 86 65C109 92 159 67 192 30M175 32L195 26L193 48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p class="intro-text">I’m a computer science graduate exploring robotics, machine learning, and language models.</p>
+        <p class="intro-personal">I like building stuff.</p>
         <div class="intro-links"><a class="primary-link" href="#work">Explore my work <span>↓</span></a><a href={site.resumeUrl}>Read my résumé ↗</a></div>
       </div>
-      <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/><figcaption><span>Aditya Kaleeswar</span><span>CS graduate · VIT ’26</span></figcaption></figure>
+      <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
     </section>
-    <aside class="now-strip"><p class="eyebrow"><span class="status-dot"></span> Currently building</p><div><a href="/now">Stress Stack <span>↗</span></a><p>Turning real repositories into reproducible evaluations for coding models.</p></div><a class="now-more" href="/now">Notes from the work →</a></aside>
+    <aside class="now-strip"><p class="eyebrow"><span class="status-dot"></span> Currently building</p><div><a href="/now">Stress Stack <span>↗</span></a><p>Turning real repositories into reproducible evaluations for coding models.</p></div><a class="now-more" href="/now">Details →</a></aside>
     <section id="work" class="editorial-section">
-      <div class="section-heading"><div><p class="eyebrow">01 / Selected work</p><h2>Questions turned into systems.</h2></div><a href="/projects">All projects ↗</a></div>
+      <div class="section-heading"><div><h2>Projects</h2></div><a href="/projects">All projects ↗</a></div>
       <FeaturedProjects/>
     </section>
-    <section class="editorial-section writing-section">
-      <div><p class="eyebrow">02 / The notebook</p><h2>Thinking out loud.</h2><p class="section-description">Research notes, things I’ve built, and the details that don’t fit in a README.</p><a class="text-link" href="/blog">Visit the notebook ↗</a></div>
-      <div class="notebook-list">
-      {posts.length ? posts.map(p=><a class="notebook-row" href={p.data.url ?? `/blog/${p.id}`}><span class="eyebrow">{p.data.date.toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</span><h3>{p.data.title}</h3><span>↗</span></a>) : <>
-        <p class="eyebrow">On the writing desk · forthcoming</p>
-        <div class="notebook-row"><span>01</span><h3>Inside Alpha Stack’s build-and-repair loop</h3></div>
-        <div class="notebook-row"><span>02</span><h3>How CRAFT explores and maps hazards</h3></div>
-        <div class="notebook-row"><span>03</span><h3>Learning from concrete, with uncertainty</h3></div>
-        <div class="notebook-row"><span>04</span><h3>From crack pixels to fracture mechanics</h3></div>
-      </>}
-      </div>
-    </section>
     <section class="editorial-section background-section">
-      <div><p class="eyebrow">03 / Along the way</p><h2>Learning by doing.</h2><p class="section-description">From autonomous rovers to materials research and coding agents.</p><a class="text-link" href="/experience">Experience & education ↗</a></div>
+      <div><h2>Experience</h2><a class="text-link" href="/experience">Experience & education ↗</a></div>
       <div class="background-list">
         <div><span class="eyebrow">2026</span><h3>UTRGV · AIM Lab</h3><p>Research intern / uncertainty-aware ML & fracture mechanics</p></div>
         <div><span class="eyebrow">2024–2025</span><h3>Samsung Research · PRISM</h3><p>Research intern / multi-agent data visualization</p></div>
         <div><span class="eyebrow">2024–2025</span><h3>Team Vyadh</h3><p>Autonomous systems / Mars rover navigation & perception</p></div>
       </div>
     </section>
-    <section class="contact-section"><p class="eyebrow">Ideas, research, or a conversation</p><h2>Let’s compare notes.</h2><a href={`mailto:${site.links.email}`}>{site.links.email} ↗</a></section>
+    <section class="contact-section"><h2>Contact</h2><a href={`mailto:${site.links.email}`}>{site.links.email} ↗</a></section>
   </div>
 </BaseLayout>

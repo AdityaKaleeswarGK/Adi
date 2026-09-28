@@ -8,9 +8,9 @@ import WorkArt from "./WorkArt.astro";
     <div class="work-card-body">
       <p class="eyebrow">{item.number} / {item.field}</p>
       <h3><a href={`/projects/${item.slug}`}>{item.title} <span>↗</span></a></h3>
-      <p class="work-subtitle">{item.subtitle}</p>
+
       <p class="work-description">{item.description}</p>
-      <div class="work-card-bottom"><span>{item.fact}<small>{item.factLabel}</small></span><a href={`/projects/${item.slug}`} aria-label={`Read about ${item.title}`}>Explore →</a></div>
+      <div class="work-card-bottom"><a href={`/projects/${item.slug}`} aria-label={`Read about ${item.title}`}>Details →</a></div>
     </div>
   </article>)}
 </div>

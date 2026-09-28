@@ -12,7 +12,7 @@ export const site = {
   tagline: "Computer science graduate exploring robotics, machine learning, and language models.",
   // A slightly longer intro used on the homepage / about.
   intro:
-    "I’m Aditya, a computer science graduate exploring robotics, machine learning, and language models. A researcher at heart, driven by building.",
+    "I’m Aditya, a computer science graduate exploring robotics, machine learning, and language models. I like building stuff.",
 
   // Path to your résumé PDF (lives in /public). To update it, just replace
   // the file at public/resume.pdf — no code change needed.
