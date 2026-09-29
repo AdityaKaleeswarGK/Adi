@@ -343,9 +343,14 @@ h1, h2, h3 { text-wrap: balance; }
 @media(max-width:600px){main{padding-top:30px!important}.navigation{min-height:95px;gap:0;flex-wrap:wrap;padding-block:14px}.wordmark{font-size:27px}.search-shortcut{order:2}.nav-items{order:3;width:100%;justify-content:space-between;gap:8px;font-size:12px;margin-top:6px}.intro-layout{grid-template-columns:1fr;padding:10px 0 35px;gap:28px}.intro-copy h1{font-size:58px;letter-spacing:-2.8px}.intro-kicker{font-size:9px;letter-spacing:.8px;margin-bottom:22px}.intro-text{font-size:16px;margin-top:22px}.portrait{max-width:none;width:100%;transform:none;padding:8px;display:grid;grid-template-columns:115px 1fr;gap:14px;align-items:center}.portrait img{aspect-ratio:1;object-position:50% 35%}.portrait figcaption{padding:0;font-size:15px}.portrait figcaption span:last-child{font-size:10px}.now-strip{grid-template-columns:1fr;gap:12px;padding:22px}.now-more{grid-column:1}.editorial-section{padding-top:48px}.section-heading{display:block}.section-heading>a{display:inline-block;margin-top:15px}.section-heading h2,.editorial-section>div>h2{font-size:31px}.work-grid{grid-template-columns:1fr;gap:24px}.work-card-body{padding:23px}.work-description{min-height:0}.writing-section,.background-section{grid-template-columns:1fr;gap:24px;margin-top:48px;padding-top:30px}.contact-section{margin-top:40px;padding-top:35px}.contact-section h2{font-size:37px}.archive-link{align-items:start;flex-direction:column}.page-intro{margin-top:0}.now-feature{padding:22px}.intro-links{gap:20px;font-size:12px}}
 
 /* Direct introduction and photo pointer. */
-.personal-image { margin-top:56px; padding-top:32px; border-top:1px solid var(--color-border); }
-.personal-image figcaption { margin-bottom:20px; font-size:15px; color:var(--color-muted); }
-.personal-image img { display:block; width:100%; max-width:420px; height:auto; border:1px solid var(--color-border); border-radius:4px; }
+ .personal-reminder { position:relative; width:fit-content; margin-top:24px; z-index:2; }
+.personal-reminder summary { display:flex; align-items:center; gap:14px; list-style:none; cursor:pointer; color:var(--color-muted); font-size:12px; }
+.personal-reminder summary::-webkit-details-marker { display:none; }
+.personal-reminder summary:hover { color:var(--color-fg); }
+.personal-reminder summary span { font-size:17px; transition:transform .2s; }
+.personal-reminder[open] summary span { transform:rotate(45deg); }
+.reminder-image { position:absolute; top:calc(100% + 12px); left:0; width:min(320px, calc(100vw - 40px)); padding:8px; background:var(--color-surface); border:1px solid var(--color-border); border-radius:6px; box-shadow:0 16px 45px #0008; }
+.reminder-image img { display:block; width:100%; height:auto; border-radius:2px; }
 .primary-link { color:#111413; }
 .intro-layout { position:relative; }
 .intro-copy { position:relative; }

@@ -7,12 +7,17 @@ import { site } from "../site.config";
   <div class="container-wide">
     <section class="intro-layout">
       <div class="intro-copy">
-        <p class="eyebrow intro-kicker">Robotics · Machine learning · Language models</p>
         <h1>Hi, I’m Aditya.</h1>
         <svg class="portrait-arrow" viewBox="0 0 210 120" fill="none" aria-hidden="true"><path d="M8 85C55 108 109 93 103 55C98 25 65 41 86 65C109 92 159 67 192 30M175 32L195 26L193 48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <p class="intro-text">I’m a computer science graduate exploring robotics, machine learning, and language models.</p>
         <p class="intro-personal">I like building stuff.</p>
         <div class="intro-links"><a class="primary-link" href="#work">Explore my work <span>↓</span></a><a href={site.resumeUrl}>Read my résumé ↗</a></div>
+        <details class="personal-reminder">
+          <summary>A reminder I keep <span aria-hidden="true">+</span></summary>
+          <div class="reminder-image">
+            <img src="/keep-building.jpeg" alt="Raptor 1 and Raptor 3 side by side, with the message: First you make it work. Then you can always make it beautiful." width="1206" height="1425" loading="lazy" decoding="async" />
+          </div>
+        </details>
       </div>
       <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
     </section>
@@ -29,10 +34,6 @@ import { site } from "../site.config";
         <div><span class="eyebrow">2024–2025</span><h3>Team Vyadh</h3><p>Autonomous systems / Mars rover navigation & perception</p></div>
       </div>
     </section>
-    <figure class="personal-image">
-      <figcaption>Something that keeps me building.</figcaption>
-      <img src="/keep-building.jpeg" alt="A side-by-side image labeled Raptor 1, 2019 and Raptor 3, 2024, with the message: First you make it work. Then you can always make it beautiful." width="1206" height="1425" loading="lazy" decoding="async" />
-    </figure>
     <section class="contact-section"><h2>Contact</h2><a href={`mailto:${site.links.email}`}>{site.links.email} ↗</a></section>
   </div>
 </BaseLayout>
