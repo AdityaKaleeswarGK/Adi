@@ -8,7 +8,6 @@ import { site } from "../site.config";
     <section class="intro-layout">
       <div class="intro-copy">
         <h1>Hi, I’m Aditya.</h1>
-        <svg class="portrait-arrow" viewBox="0 0 210 120" fill="none" aria-hidden="true"><path d="M8 85C55 108 109 93 103 55C98 25 65 41 86 65C109 92 159 67 192 30M175 32L195 26L193 48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <p class="intro-text">I’m a computer science graduate exploring robotics, machine learning, and language models.</p>
         <p class="intro-personal">I like building stuff.</p>
         <div class="intro-links"><a class="primary-link" href="#work">Explore my work <span>↓</span></a><a href={site.resumeUrl}>Read my résumé ↗</a></div>
@@ -19,7 +18,7 @@ import { site } from "../site.config";
           </div>
         </details>
       </div>
-      <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
+      <figure class="portrait"><svg class="portrait-arrow" viewBox="0 0 160 100" fill="none" aria-hidden="true"><path d="M8 15C40 3 80 9 69 33C56 60 36 29 62 25C91 21 108 65 147 66M133 54L148 66L133 77" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
     </section>
     <aside class="now-strip"><p class="eyebrow"><span class="status-dot"></span> Currently building</p><div><a href="/now">Stress Stack <span>↗</span></a><p>Turning real repositories into reproducible evaluations for coding models.</p></div><a class="now-more" href="/now">Details →</a></aside>
     <section id="work" class="editorial-section">
