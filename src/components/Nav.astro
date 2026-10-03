@@ -4,7 +4,7 @@ const path = Astro.url.pathname;
 ---
 <header class="site-header">
   <nav class="container-wide navigation" aria-label="Main">
-    <a href="/" class="wordmark" aria-label={`${site.name} — home`}>aditya<span>.</span></a>
+    <a href="/" class="wordmark" aria-label={`${site.name} — home`}><span lang="ta" style="color:inherit;letter-spacing:normal">ஆதித்யா</span></a>
     <ul class="nav-items">{nav.map(item => <li><a href={item.href} aria-current={(item.href === '/' ? path === '/' : path.startsWith(item.href)) ? 'page' : undefined}>{item.label}</a></li>)}</ul>
     <button id="cmdk-hint" class="search-shortcut" aria-label="Open command palette">⌘ K</button>
   </nav>
