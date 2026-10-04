@@ -1,0 +1,49 @@
+<sam-measurement class="sam-study">
+ <header><span>Orientation → member mask → pixels → millimetres</span><h3>Follow the direction of the crack</h3><p>Rotate the trace in the image plane, then follow the measurement. This is a controlled schematic, not a live SAM prediction.</p></header>
+ <div class="sam-steps" role="group" aria-label="Member measurement stage">{['Direction','Surface mask','Pixel chord','Physical scale'].map((t,i)=><button type="button" data-step={i} aria-pressed={i===0?'true':'false'}>{i+1}. {t}</button>)}</div>
+ <svg viewBox="0 0 700 420" role="img" aria-label="Front-facing surface with a rotatable crack, dominant direction, offset prompts and boundary chord">
+  <defs><pattern id="sam-grain" width="31" height="29" patternUnits="userSpaceOnUse"><circle cx="4" cy="9" r=".6" fill="#999aa4"/><circle cx="23" cy="20" r=".8" fill="#656570"/><path d="M12 3l3 1M18 24l2-1" stroke="#74747d" stroke-width=".6"/></pattern></defs>
+  <rect x="90" y="80" width="520" height="280" fill="#53535b" stroke="#a8a5ac"/>
+  <rect x="90" y="80" width="520" height="280" fill="url(#sam-grain)"/>
+  <rect data-surface x="90" y="80" width="520" height="280" fill="#78aaf2" fill-opacity=".26" stroke="#8ab4f8" stroke-width="2" visibility="hidden"/>
+  <path data-axis d="M90 220H610" stroke="#bbb1ec" stroke-width="1.5" stroke-dasharray="6 6" fill="none"/>
+  <path data-trace d="M90 220H270" stroke="#19191f" stroke-width="8" fill="none"/>
+  <path data-centre d="M90 220H270" stroke="#f2a279" stroke-width="2" fill="none"/>
+  <g data-prompts fill="#b9a4ee" stroke="#272132" stroke-width="1.2" visibility="hidden"></g>
+  <g data-chord visibility="hidden"><path data-chord-line d="M90 220H610" stroke="#edc57d" stroke-width="2" fill="none"/><circle data-b1 cx="90" cy="220" r="5" fill="#edc57d"/><circle data-b2 cx="610" cy="220" r="5" fill="#edc57d"/></g>
+  <path d="M90 65H610M90 60V70M610 60V70" stroke="#a8a5ac" fill="none"/><text x="350" y="54" text-anchor="middle" fill="#c6c2cc" font-size="14">Fixed specimen width W = 520 px</text>
+  <text x="95" y="28" fill="#c6c2cc" font-size="15">Front-facing image · fixed surface</text>
+  <text data-angle-label x="95" y="390" fill="#c1b3ef" font-size="17">Dominant direction θ = 0°</text>
+  <text data-width-label x="600" y="390" text-anchor="end" fill="#edc57d" font-size="17"></text>
+ </svg>
+ <div class="sam-legend"><span class="peach">Trace</span><span class="lavender">Direction / prompts</span><span class="blue">Member mask</span><span class="gold">Measured chord</span></div>
+ <div class="sam-controls">
+  <label>Crack orientation θ<input aria-label="Crack orientation in degrees" name="theta" type="range" min="-40" max="40" step="1" value="0"/><output data-theta>0°</output></label>
+ </div>
+ <p class="sam-explanation" data-explanation aria-live="polite">The dominant direction θ defines an axis through the trace. The model's a is a length along a compatible crack, not the angle.</p>
+ <div class="sam-values" data-values hidden aria-live="polite"><div>Chord along crack direction <b data-w>520.0 px</b></div><div data-scale-block hidden>Example scale: 0.5 mm/px <b data-scale>260.0 mm</b></div></div>
+ <p class="sam-caption">The blue mask covers the complete visible member in this idealized example. A real mask that misses an edge would shorten the measured chord; a mask that leaks into the background could lengthen it. Rotation is in the image plane. The gray dimension is the fixed specimen width W. The gold chord follows the crack direction. They coincide at 0° in this example; at other angles the chord is a CV measurement, not automatically the W of the validated PINN geometry.</p>
+</sam-measurement>
+<style>
+.sam-study{display:block;margin:2.4rem 0;padding:24px 0;border-block:1px solid #41414e}.sam-study header span{font:11px monospace;color:#b8ace5;text-transform:uppercase;letter-spacing:.06em}.sam-study h3{font:25px/1.35 Georgia,serif;margin:9px 0 12px}.sam-study header p,.sam-explanation{font-size:13px;line-height:1.8;color:#c4bfca;text-align:left}.sam-steps{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0 8px}.sam-steps button{font:12px sans-serif;border:1px solid #535164;padding:9px 11px;border-radius:4px;background:#1d1c24;color:#d0c9db;cursor:pointer}.sam-steps button[aria-pressed=true]{background:#b8a6e3;color:#201a2b}.sam-study svg{width:100%;height:auto;background:#191920;border-radius:5px;margin:14px 0}.sam-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11px}.peach{color:#f2a279}.lavender{color:#b9a4ee}.blue{color:#8ab4f8}.gold{color:#edc57d}.sam-controls{display:flex;flex-wrap:wrap;gap:22px;margin:24px 0}.sam-controls label{flex:1;min-width:150px;font-size:12px}.sam-controls label[hidden]{display:none}.sam-controls input{width:100%;display:block;margin:12px 0;accent-color:#b9a4ee}.sam-controls output{font:12px monospace;color:#edc57d}.sam-values{display:flex;flex-wrap:wrap;gap:24px;border-top:1px solid #41414e;padding-top:15px;margin-top:18px;font-size:11px;color:#b0aabb}.sam-values[hidden]{display:none}.sam-values b{display:block;font:21px Georgia,serif;color:#eee8e4;margin-top:5px}.sam-caption{font-size:11px;line-height:1.85;color:#a9a4b1;text-align:left;margin-top:18px}.sam-steps button:focus-visible,.sam-controls input:focus-visible{outline:2px solid #edc57d;outline-offset:4px}@media(max-width:500px){.sam-steps button{flex:1 1 40%}.sam-study h3{font-size:22px}}
+</style>
+<script>
+class SamMeasurement extends HTMLElement {
+ connectedCallback(){if(this.dataset.ready)return;this.dataset.ready='true';let step=0;
+ const $=(s:string)=>this.querySelector<HTMLElement>(s)!;const text=(s:string,t:string)=>{$(s).textContent=t;};const attr=(s:string,k:string,v:string)=>$(s).setAttribute(k,v);const value=(n:string)=>Number(this.querySelector<HTMLInputElement>(`[name=${n}]`)!.value);
+ const update=()=>{const deg=value('theta'),r=deg*Math.PI/180,dx=Math.cos(r),dy=-Math.sin(r),bias=0,z=500,anchor=[90+90*dx,220+90*dy];
+ const chord=(inset:number)=>{const bounds=[90+inset,610-inset,80+inset,360-inset];let lo=-Infinity,hi=Infinity;[[anchor[0],dx,bounds[0],bounds[1]],[anchor[1],dy,bounds[2],bounds[3]]].forEach(([p,d,min,max])=>{if(Math.abs(d)>1e-8){const a=(min-p)/d,b=(max-p)/d;lo=Math.max(lo,Math.min(a,b));hi=Math.min(hi,Math.max(a,b));}});return {a:[anchor[0]+lo*dx,anchor[1]+lo*dy],b:[anchor[0]+hi*dx,anchor[1]+hi*dy],length:hi-lo};};
+ const exact=chord(0),measured=chord(bias);const path=(a:number[],b:number[])=>`M${a[0]} ${a[1]}L${b[0]} ${b[1]}`;
+ attr('[data-axis]','d',path(exact.a,exact.b));let d='';for(let i=0;i<=12;i++){const t=i*15,w=i===0||i===12?0:Math.sin(i*2.1)*2.1;d+=`${i?'L':'M'}${90+t*dx-w*dy} ${220+t*dy+w*dx}`;}attr('[data-trace]','d',d);attr('[data-centre]','d',d);
+ attr('[data-surface]','x',String(90+bias));attr('[data-surface]','y',String(80+bias));attr('[data-surface]','width',String(520-2*bias));attr('[data-surface]','height',String(280-2*bias));
+ const prompts=$('[data-prompts]');prompts.replaceChildren();[35,90,145].forEach(t=>[-1,1].forEach(sign=>{const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',String(90+t*dx-sign*18*dy));c.setAttribute('cy',String(220+t*dy+sign*18*dx));c.setAttribute('r','4');prompts.appendChild(c);}));
+ attr('[data-chord-line]','d',path(measured.a,measured.b));[['[data-b1]',measured.a],['[data-b2]',measured.b]].forEach(([s,p])=>{const point=p as number[];attr(s as string,'cx',String(point[0]));attr(s as string,'cy',String(point[1]));});
+ ['[data-surface]','[data-prompts]'].forEach(s=>attr(s,'visibility',step>=1?'visible':'hidden'));attr('[data-chord]','visibility',step>=2?'visible':'hidden');
+ $('[data-values]').hidden=step<2;$('[data-scale-block]').hidden=step<3;
+ text('[data-theta]',`${deg}°`);text('[data-angle-label]',`Dominant direction θ = ${deg}°`);text('[data-width-label]',step>=2?`Chord = ${measured.length.toFixed(1)} px`:'');text('[data-w]',`${measured.length.toFixed(1)} px`);text('[data-scale]',`${(measured.length*z/1000).toFixed(1)} mm`);
+ text('[data-explanation]',['The direction is measured from the horizontal: negative angles slope downward to the right. The chord follows that direction, not its perpendicular. The model’s a is crack length.','Offset prompts ask for the surrounding member surface. The crack remains a separate measurement. The blue mask covers the entire visible member surface.','Extend the axis to both boundaries of the selected mask. Their separation is the measured chord in pixels. The prototype stores it as W_px, but for this fixed block an inclined chord is not the horizontal specimen width W.','Apply a known scale: this example uses 0.5 mm/px. Scale can come from calibration, a reference object, or depth with camera intrinsics. The next section compares these options.'][step]);};
+ this.querySelectorAll<HTMLButtonElement>('[data-step]').forEach(button=>button.addEventListener('click',()=>{step=Number(button.dataset.step);this.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));update();}));this.addEventListener('input',update);update();
+ }
+}
+if(!customElements.get('sam-measurement'))customElements.define('sam-measurement',SamMeasurement);
+</script>

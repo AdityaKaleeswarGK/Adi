@@ -1,0 +1,9 @@
+---
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+interface Props { tex: string; display?: boolean; }
+const { tex, display = true } = Astro.props;
+const html = katex.renderToString(tex, {displayMode: display, throwOnError: true, output: 'htmlAndMathml', trust: false});
+---
+{display ? <div class="research-math" set:html={html} /> : <span set:html={html} />}
+<style>.research-math{padding:18px 12px;margin:1.7rem 0;overflow-x:auto;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface);font-size:1.04rem}.research-math :global(.katex-display){margin:.3em 0}@media(max-width:500px){.research-math{font-size:.86rem}}</style>

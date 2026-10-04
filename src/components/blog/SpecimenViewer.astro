@@ -1,0 +1,24 @@
+<edge-specimen class="specimen">
+ <header><span>Mode I · opening tension</span><h3>Pulling perpendicular to the crack</h3></header>
+ <svg viewBox="0 0 640 420" role="img" aria-label="Front view of an edge-cracked plate with tension acting upward on the top edge and downward on the bottom edge">
+ <defs><linearGradient id="plate-shade" x2="1" y2="1"><stop stop-color="#65616e"/><stop offset="1" stop-color="#383640"/></linearGradient></defs>
+ <path data-plate d="M120 110H520V310H120V214L200 210L120 206Z" fill="url(#plate-shade)" stroke="#aba0bb" stroke-width="1.5"/>
+ <path data-crack d="M120 210H200" stroke="#f0b18a" stroke-width="3"/><circle data-tip cx="200" cy="210" r="4" fill="#f0b18a"/>
+ <g data-arrows stroke="#bca8e6" stroke-width="2" fill="none">{[180,250,320,390,460].map(x=><g><path data-top data-x={x} d={`M${x} 106V66m-6 8 6-8 6 8`}/><path data-bottom data-x={x} d={`M${x} 314v40m-6-8 6 8 6-8`}/></g>)}</g>
+ <text x="320" y="35" text-anchor="middle" fill="#d6c4ed" font-size="14" data-load>Tension σ = 2.0 MPa</text>
+ <path data-dimension d="M120 239H200M120 234v10M200 234v10" stroke="#edc57d" fill="none"/><text data-length x="160" y="265" text-anchor="middle" fill="#edc57d" font-size="13">a = 20 mm</text>
+ <text x="420" y="205" text-anchor="middle" fill="#d0c7d9" font-size="13">W = 100 mm</text><text x="320" y="399" text-anchor="middle" fill="#b9afc5" font-size="12">Equal, opposite tension opens the crack faces</text>
+ </svg>
+ <div class="controls"><label>Crack length a<input type="range" name="a" min="10" max="30" value="20" step="1" aria-label="Specimen crack length in millimetres"/><output data-a>20 mm</output></label><label>Tension σ<input type="range" name="sigma" min="0.5" max="4" step="0.1" value="2" aria-label="Specimen tension in megapascals"/><output data-sigma>2.0 MPa</output></label></div>
+ <div class="results" aria-live="polite"><span>Handbook stress intensity <b data-k>21.7 MPa√mm</b></span><span>Ratio to assumed toughness <b data-ratio>0.69</b></span></div>
+ <p>Arrows show the loading direction; their length increases with the selected tension. The opening is exaggerated for visibility. This is a geometry and load illustration, not a simulated deformation. Calculations use the Tada expression and an assumed toughness of 31.6 MPa√mm.</p>
+</edge-specimen>
+<style>
+.specimen{display:block;margin:28px 0;padding:24px;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface)}header span{font:11px monospace;letter-spacing:.08em;text-transform:uppercase;color:#bca8e6}h3{font:25px Georgia,serif;margin:10px 0 16px}svg{display:block;width:100%;background:radial-gradient(ellipse,#292431,#19181f);border-radius:8px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px}label{font-size:12px}input{display:block;width:100%;margin:12px 0;accent-color:#bca8e6}output{font:12px monospace;color:#edc57d}.results{display:flex;gap:30px;border-top:1px solid var(--color-border);margin-top:20px;padding-top:18px;font-size:11px;color:#b9aec6}.results b{display:block;font:22px Georgia,serif;color:#eee7f4;margin-top:8px}p{font-size:11px;color:#b9aec6;line-height:1.8;margin-top:18px}@media(max-width:500px){.specimen{padding:16px}.results{gap:18px}.results b{font-size:18px}h3{font-size:22px}}
+</style>
+<script>
+class EdgeSpecimen extends HTMLElement {
+ connectedCallback(){if(this.dataset.ready)return;this.dataset.ready='true';const update=()=>{const a=Number(this.querySelector<HTMLInputElement>('[name=a]')!.value),sigma=Number(this.querySelector<HTMLInputElement>('[name=sigma]')!.value),tip=120+a*4,x=a/100,f=1.12-.231*x+10.55*x*x-21.72*x**3+30.39*x**4,k=f*sigma*Math.sqrt(Math.PI*a);const text=(selector:string,value:string)=>{this.querySelector(selector)!.textContent=value;};this.querySelector('[data-plate]')!.setAttribute('d',`M120 110H520V310H120V214L${tip} 210L120 206Z`);this.querySelector('[data-crack]')!.setAttribute('d',`M120 210H${tip}`);this.querySelector('[data-tip]')!.setAttribute('cx',String(tip));this.querySelector('[data-dimension]')!.setAttribute('d',`M120 239H${tip}M120 234v10M${tip} 234v10`);this.querySelector('[data-length]')!.setAttribute('x',String((120+tip)/2));text('[data-length]',`a = ${a} mm`);text('[data-a]',`${a} mm`);text('[data-sigma]',`${sigma.toFixed(1)} MPa`);text('[data-load]',`Tension σ = ${sigma.toFixed(1)} MPa`);text('[data-k]',`${k.toFixed(1)} MPa√mm`);text('[data-ratio]',(k/31.6).toFixed(2));const length=24+sigma*8;this.querySelectorAll<SVGPathElement>('[data-top]').forEach(el=>{const x=Number(el.dataset.x);el.setAttribute('d',`M${x} 106V${106-length}m-6 8 6-8 6 8`);});this.querySelectorAll<SVGPathElement>('[data-bottom]').forEach(el=>{const x=Number(el.dataset.x);el.setAttribute('d',`M${x} 314v${length}m-6-8 6 8 6-8`);});};this.addEventListener('input',update);update();}
+}
+if(!customElements.get('edge-specimen'))customElements.define('edge-specimen',EdgeSpecimen);
+</script>

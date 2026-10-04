@@ -1,0 +1,42 @@
+---
+const rows = [{name:'SUT-Crack',error:13.35,n:'130 pavement images'},{name:'MetroDef3D',error:4.65,n:'192 renders · 8 geometries'}];
+const ratios=[.1,.15,.2,.25,.3], tada=[1.1837,1.2648,1.3707,1.501,1.6599], pinn=[1.0874,1.1743,1.2817,1.4094,1.5685];
+const points=(values:number[])=>values.map((v,i)=>`${70+i*120},${260-(v-1)*280}`).join(' ');
+---
+<evaluation-charts class="evaluation-figure">
+ <figcaption><span>Evaluation / two separate experiments</span><h3>Measurement error and mechanics accuracy</h3></figcaption>
+ <section data-chart><h4>CV · Length error against dataset references</h4><p>Raw-RGB YOLOv8n · mean absolute percentage error · lower is better</p>
+ <div class="error-bars">{rows.map(row=><div class="error-row"><div><strong>{row.name}</strong><small>{row.n}</small></div><div class="bar-track"><div data-bar style={`width:${row.error/15*100}%`}></div></div><b>{row.error.toFixed(2)}%</b></div>)}</div>
+ <div class="bar-axis"><span>0%</span><span>15% error</span></div>
+ <p class="chart-note">These results measure segmentation-to-length agreement. They do not include MobileSAM member-boundary error or physical depth-calibration error.</p></section>
+ <section data-chart><h4>PINN · Geometry factor against Tada</h4><p>Prescribed geometry · plane strain · manuscript v14 ratio sweep</p>
+ <svg viewBox="0 0 620 310" role="img" aria-label="PINN geometry factors consistently below Tada for crack ratios 0.10 to 0.30. Error decreases from 8.1 percent to 5.5 percent.">
+ {[1,1.2,1.4,1.6].map(v=><g><path d={`M70 ${260-(v-1)*280}H550`} stroke="#45414d"/><text x="52" y={264-(v-1)*280} text-anchor="end">{v.toFixed(1)}</text></g>)}
+ <text x="70" y="32">Geometry factor F</text><polyline data-draw points={points(tada)} fill="none" stroke="#8ab4f8" stroke-width="2.5"/><polyline data-draw points={points(pinn)} fill="none" stroke="#edc57d" stroke-width="2.5"/>
+ {ratios.map((v,i)=><g><circle data-point cx={70+i*120} cy={260-(tada[i]-1)*280} r="4" fill="#8ab4f8"/><circle data-point cx={70+i*120} cy={260-(pinn[i]-1)*280} r="4" fill="#edc57d"/><text x={70+i*120} y="282" text-anchor="middle">{v.toFixed(2)}</text></g>)}<text x="310" y="307" text-anchor="middle">Crack-to-width ratio a/W</text>
+ </svg><div class="chart-legend"><span>Tada reference</span><span>PINN mean</span></div><p class="chart-note">The learned factor follows the trend but underpredicts the reference by 5.5–8.1%. Lines connect the five tested ratios; they are not additional test results. Seed spreads are listed in the table below.</p></section>
+</evaluation-charts>
+<style>
+.evaluation-figure{display:block;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface);padding:24px;margin:28px 0;text-align:left}.evaluation-figure figcaption>span{font:10px monospace;color:#bca8e6;text-transform:uppercase;letter-spacing:.06em}.evaluation-figure h3{font:25px/1.3 Georgia,serif;margin:8px 0 24px}.evaluation-figure section+section{border-top:1px solid var(--color-border);margin-top:25px;padding-top:25px}.evaluation-figure h4{font-size:14px;margin:0}.evaluation-figure p{font-size:11px;line-height:1.7;color:#bdb4c6;margin:8px 0 18px}.error-row{display:grid;grid-template-columns:130px 1fr 55px;gap:12px;align-items:center;margin:18px 0}.error-row strong{font-size:12px}.error-row small{display:block;font-size:9px;color:#aaa1b5}.error-row b{font:12px monospace;color:#edc57d}.bar-track{height:14px;border-radius:3px;background:#34303b}.bar-track>div{height:100%;background:#c5a7e9;border-radius:3px}.error-row:nth-child(2) .bar-track>div{background:#8ab4f8}.bar-axis{display:flex;justify-content:space-between;margin-left:142px;margin-right:67px;color:#a69eaf;font:10px monospace}.evaluation-figure svg{width:100%;margin-top:8px}.evaluation-figure svg text{font:12px sans-serif;fill:#c2b9cc}.chart-legend{display:flex;gap:22px;justify-content:center;font-size:11px}.chart-legend span:before{content:'';display:inline-block;width:18px;height:3px;background:#8ab4f8;margin-right:8px;vertical-align:middle}.chart-legend span+span:before{background:#edc57d}.evaluation-figure .chart-note{margin-bottom:0}@media(max-width:500px){.evaluation-figure{padding:16px}.error-row{grid-template-columns:96px 1fr 47px;gap:8px}.bar-axis{margin-left:104px;margin-right:55px}.evaluation-figure h3{font-size:22px}}
+
+.evaluation-figure section{position:relative;padding:22px!important;border:1px solid #484052!important;border-radius:12px;background:radial-gradient(ellipse at top right,#30253b,#1c1b23 70%)}.evaluation-figure h4{padding-right:32px}.chart-replay{position:absolute;top:15px;right:15px;width:30px;height:30px;border:1px solid #6c5e7d;border-radius:8px;display:grid;place-items:center;color:#dac4f4;background:#272031;cursor:pointer;font-size:20px}.chart-replay:focus-visible{outline:2px solid #bca8e6;outline-offset:3px}.bar-track{height:20px}.bar-track>div{transform-origin:left;background:linear-gradient(90deg,#8062ac,#c9a2ed)}.error-row:nth-child(2) .bar-track>div{background:linear-gradient(90deg,#476eac,#95c6fc)}[data-point]{filter:drop-shadow(0 0 4px #b8a8df66)}@media(max-width:500px){.evaluation-figure section{padding:15px!important}.evaluation-figure{padding:12px}}
+</style>
+
+<script>
+import { animate } from 'motion';
+class EvaluationCharts extends HTMLElement {
+ private observer?: IntersectionObserver;
+ private animations: ReturnType<typeof animate>[]=[];
+ connectedCallback(){if(this.dataset.ready)return;this.dataset.ready='true';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const run=(section:HTMLElement)=>{section.dataset.played='true';if(reduced)return;
+ section.querySelectorAll<HTMLElement>('[data-bar]').forEach((bar,i)=>this.animations.push(animate(bar,{scaleX:[0,1]},{duration:1.7,delay:i*.25,ease:[.22,1,.36,1]})));
+ section.querySelectorAll<SVGPolylineElement>('[data-draw]').forEach((line,i)=>this.animations.push(animate(line,{pathLength:[0,1],opacity:[0,1]},{duration:2.3,delay:i*.45,ease:'easeInOut'})));
+ section.querySelectorAll<SVGCircleElement>('[data-point]').forEach((point,i)=>this.animations.push(animate(point,{opacity:[0,1]},{duration:.5,delay:.3+Math.floor(i/2)*.4})));
+ };
+ this.observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){const section=entry.target as HTMLElement;if(!section.dataset.played)run(section);}else{delete (entry.target as HTMLElement).dataset.played;}}),{threshold:0,rootMargin:'-20% 0px -20% 0px'});
+ this.querySelectorAll<HTMLElement>('[data-chart]').forEach(section=>{this.observer!.observe(section);});
+ }
+ disconnectedCallback(){this.observer?.disconnect();this.animations.forEach(a=>a.stop());}
+}
+if(!customElements.get('evaluation-charts'))customElements.define('evaluation-charts',EvaluationCharts);
+</script>

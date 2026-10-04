@@ -1,0 +1,77 @@
+---
+interface Props { mode: 'mechanics' | 'geometry' | 'scale'; }
+const { mode } = Astro.props;
+---
+<crack-explainer data-mode={mode} class="crack-lab">
+  {mode === 'mechanics' && <>
+    <header><span>01 / Try the mechanics</span><h3>The same crack under a different load</h3></header>
+    <svg viewBox="0 0 620 280" role="img" aria-label="Single edge crack in a plate pulled vertically. Sliders change crack length and loading.">
+      <rect x="120" y="60" width="380" height="170" rx="3" fill="#2b2937" stroke="#8881a4"/>
+      <g stroke="#b6a7df" stroke-width="2" fill="none"><path d="M200 55V18m-7 8 7-8 7 8M310 55V18m-7 8 7-8 7 8M420 55V18m-7 8 7-8 7 8M200 235v28m-7-8 7 8 7-8M310 235v28m-7-8 7 8 7-8M420 235v28m-7-8 7 8 7-8"/></g>
+      <circle data-tip-halo cx="196" cy="145" r="25" fill="#dfb779" opacity=".18"/>
+      <path data-crack d="M120 145H196" stroke="#dfb779" stroke-width="4"/>
+      <circle data-tip cx="196" cy="145" r="4" fill="#dfb779"/>
+      <text x="310" y="105" text-anchor="middle">W = 100 mm</text><text data-a-label x="158" y="175" text-anchor="middle">a = 20 mm</text>
+    </svg>
+    <div class="lab-controls"><label>Crack length a <input name="length" aria-label="Crack length in millimetres" type="range" min="10" max="30" step="1" value="20"/><output data-length>20 mm</output></label><label>Applied tension σ <input name="stress" aria-label="Applied tension in megapascals" type="range" min="0.5" max="4" step="0.1" value="2"/><output data-stress>2.0 MPa</output></label></div>
+    <div class="lab-result" aria-live="polite"><span>Kᵢ <strong data-ki>21.7 MPa√mm</strong></span><span>Kᵢ / Kᵢ꜀ <strong data-ratio>0.69</strong></span></div>
+    <p class="lab-caption">Illustrative elastic edge-crack calculation using the handbook polynomial, not PINN inference or a simulated stress field. Kᵢ꜀ = 31.6 MPa√mm is fixed for this example. The halo marks the tip only. A ratio of 1 reaches the assumed toughness; this is not a whole-structure safety test.</p>
+  </>}
+  {mode === 'geometry' && <>
+    <header><span>02 / Follow the geometry</span><h3>From a region to an ordered path</h3></header>
+    <div class="stage-buttons" role="group" aria-label="Geometry processing stages">{['Mask','Skeleton','Link','Measure'].map((label,i)=><button type="button" data-stage={i} aria-pressed={i===0?'true':'false'}>{label}</button>)}</div>
+    <svg viewBox="0 0 620 245" role="img" aria-label="Illustrative fragmented crack with a side branch, progressing through a mask, skeleton, linking, and measurements.">
+      <rect x="35" y="30" width="550" height="175" fill="#2b2937" rx="5"/>
+      <g data-mask fill="none" stroke="#b6a7df" stroke-width="15" stroke-linecap="round"><path d="M70 155 120 146 170 153 220 129 260 132"/><path d="M284 125 330 110 380 115 435 89 535 80"/><path d="M330 110 346 70 376 48"/></g>
+      <g data-skeleton fill="none" stroke="#d7e6db" stroke-width="2" opacity="0"><path d="M70 155 120 146 170 153 220 129 260 132"/><path d="M284 125 330 110 380 115 435 89 535 80"/><path d="M330 110 346 70 376 48" stroke="#a9bbdf"/></g>
+      <path data-gap d="M260 132 284 125" fill="none" stroke="#dfb779" stroke-width="3" stroke-dasharray="4 4" opacity="0"/>
+      <g data-measure opacity="0" fill="#dfb779"><circle cx="70" cy="155" r="5"/><circle cx="535" cy="80" r="5"/><path d="M70 182 535 107" stroke="#dfb779" stroke-dasharray="5 5"/><text x="255" y="215">Path length ≠ endpoint distance</text></g>
+    </svg>
+    <p data-stage-copy aria-live="polite">A segmentation mask marks a region. Its thickness and topology still need to be interpreted.</p>
+    <p class="lab-caption">Schematic, not a dataset prediction. The amber gap is inferred; the blue branch stays separate. An assembled path is not automatically a valid single-edge-crack mechanics input.</p>
+  </>}
+  {mode === 'scale' && <>
+    <header><span>04 / Pixels need a scale</span><h3>A depth source can change; the conversion stays</h3></header>
+    <div class="stage-buttons" role="group" aria-label="Calibration source">{['Metric model','Depth camera','Reference object'].map((label,i)=><button type="button" data-source={i} aria-pressed={i===0?'true':'false'}>{label}</button>)}</div>
+    <svg viewBox="0 0 620 220" role="img" aria-label="Pinhole camera observing a planar surface. Known distance and focal length determine physical scale.">
+      <path d="M105 110 460 35V185Z" fill="#b6a7df" opacity=".08"/><path d="M105 110 460 35M105 110 460 185" stroke="#8881a4" fill="none"/>
+      <rect x="65" y="87" width="40" height="46" rx="6" fill="#b6a7df"/><path d="M460 30V190" stroke="#b6a7df" stroke-width="6"/>
+      <path d="M461 90v40" stroke="#dfb779" stroke-width="7"/><text x="480" y="115">100 px</text>
+      <path d="M120 165H440" stroke="#8881a4" stroke-dasharray="4 4"/><text x="280" y="192" text-anchor="middle" data-distance>Z = 500 mm</text><text x="80" y="65" text-anchor="middle">Camera</text>
+    </svg>
+    <div class="lab-controls"><label><span data-scale-label>Surface distance Z</span><input name="distance" aria-label="Surface distance in millimetres" type="range" min="250" max="1500" step="50" value="500"/><output data-z>500 mm</output></label></div>
+    <div class="lab-result" aria-live="polite"><span>Scale <strong data-scale>0.500 mm/px</strong></span><span>100 px trace <strong data-mm>50.0 mm</strong></span></div>
+    <p data-source-copy>Depth Anything V2 supplies an estimated metric surface distance. Focal length is still required: here f = 1000 px.</p>
+    <p class="lab-caption">Illustrative front-facing planar surface. The slider holds image length fixed to show the conversion, not the apparent size of one object moving away. Surface distance does not reveal how far a crack penetrates the material.</p>
+  </>}
+</crack-explainer>
+<style>
+.crack-lab{display:block;margin:2rem 0;padding:24px;background:#1d1c27;border:1px solid #48445b;border-radius:14px;color:#eee8e4}.crack-lab header span{font:11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#b6a7df}.crack-lab header h3{font:24px Georgia,serif;margin:9px 0 15px}.crack-lab svg{width:100%;height:auto;display:block;margin:10px 0}.crack-lab svg text{fill:#c8c2d4;font:14px sans-serif}.lab-controls{display:flex;gap:24px;flex-wrap:wrap}.lab-controls label{flex:1;min-width:180px;font-size:13px}.lab-controls input{display:block;width:100%;margin:10px 0;accent-color:#b6a7df}.lab-controls output{font:13px monospace;color:#dfb779}.lab-result{display:flex;flex-wrap:wrap;gap:24px;border-top:1px solid #48445b;margin-top:18px;padding-top:16px;font-size:12px}.lab-result strong{display:block;font:21px Georgia,serif;margin-top:5px}.lab-caption{font-size:12px;line-height:1.65;color:#aaa4b6;margin-top:16px}.stage-buttons{display:flex;gap:6px;flex-wrap:wrap}.stage-buttons button{border:1px solid #605774;border-radius:6px;background:transparent;padding:6px 12px;color:#d5cede;font:12px sans-serif;cursor:pointer}.stage-buttons button[aria-pressed=true]{background:#b6a7df;color:#211c2d}.stage-buttons button:focus-visible,input:focus-visible{outline:2px solid #dfb779;outline-offset:4px}[data-stage-copy],[data-source-copy]{font-size:14px;line-height:1.7;min-height:3.4em}.crack-lab svg g,.crack-lab svg path{transition:opacity .3s}@media(prefers-reduced-motion:reduce){.crack-lab svg *{transition:none}}@media(max-width:480px){.crack-lab{padding:16px}.crack-lab header h3{font-size:21px}.crack-lab svg text{font-size:16px}}
+</style>
+<script>
+class CrackExplainer extends HTMLElement {
+ connectedCallback(){
+  if(this.dataset.ready)return;this.dataset.ready='true';
+  const el=(s:string)=>this.querySelector<HTMLElement>(s)!;
+  const set=(s:string,t:string)=>{el(s).textContent=t};
+  const val=(s:string)=>Number(this.querySelector<HTMLInputElement>(s)!.value);
+  if(this.dataset.mode==='mechanics'){
+   const update=()=>{const a=val('[name=length]'),stress=val('[name=stress]'),x=a/100,F=1.12-.231*x+10.55*x*x-21.72*x**3+30.39*x**4,K=F*stress*Math.sqrt(Math.PI*a),tip=120+380*x;
+    set('[data-length]',`${a} mm`);set('[data-stress]',`${stress.toFixed(1)} MPa`);set('[data-ki]',`${K.toFixed(1)} MPa√mm`);set('[data-ratio]',(K/31.6).toFixed(2));set('[data-a-label]',`a = ${a} mm`);
+    el('[data-crack]').setAttribute('d',`M120 145H${tip}`);el('[data-tip]').setAttribute('cx',String(tip));el('[data-tip-halo]').setAttribute('cx',String(tip));el('[data-tip-halo]').setAttribute('r',String(12+K/2));el('[data-a-label]').setAttribute('x',String((120+tip)/2));
+   };this.addEventListener('input',update);update();
+  }
+  if(this.dataset.mode==='geometry'){
+   const copy=['A segmentation mask marks a region. Its thickness and topology still need to be interpreted.','Skeletonization reduces each region to a centreline. Junctions are split into branches before assembly.','Nearby aligned endpoints can be linked. That amber segment is reconstructed, so its length must be tracked separately.','Walk the ordered path for length; use PCA for global orientation. The straight endpoint span is a different measurement.'];
+   this.querySelectorAll<HTMLButtonElement>('[data-stage]').forEach(b=>b.addEventListener('click',()=>{const stage=Number(b.dataset.stage);this.querySelectorAll('[data-stage]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));el('[data-mask]').setAttribute('opacity',stage===0?'1':'.13');el('[data-skeleton]').setAttribute('opacity',stage>0?'1':'0');el('[data-gap]').setAttribute('opacity',stage>=2?'1':'0');el('[data-measure]').setAttribute('opacity',stage===3?'1':'0');set('[data-stage-copy]',copy[stage]);}));
+  }
+  if(this.dataset.mode==='scale'){
+   let source=0;
+   const update=()=>{const z=val('[name=distance]'),scale=source===2?.5:z/1000;set('[data-z]',`${z} mm`);set('[data-distance]',source===2?'Reference: 50 mm spans 100 px':`Z = ${z} mm`);set('[data-scale]',`${scale.toFixed(3)} mm/px`);set('[data-mm]',`${(scale*100).toFixed(1)} mm`);};
+   this.addEventListener('input',update);
+   this.querySelectorAll<HTMLButtonElement>('[data-source]').forEach(b=>b.addEventListener('click',()=>{source=Number(b.dataset.source);this.querySelectorAll('[data-source]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));el('.lab-controls').hidden=source===2;set('[data-source-copy]',['Depth Anything V2 supplies an estimated metric surface distance. Focal length is still required: here f = 1000 px.','An aligned, calibrated depth camera supplies surface distance in known units. The same conversion uses f = 1000 px. Resizing alone does not align RGB and depth.','A known 50 mm reference spans 100 px on the same plane: s = 50 / 100 = 0.5 mm/px. No estimated depth is required.'][source]);update();}));update();
+  }
+ }
+}
+if(!customElements.get('crack-explainer'))customElements.define('crack-explainer',CrackExplainer);
+</script>

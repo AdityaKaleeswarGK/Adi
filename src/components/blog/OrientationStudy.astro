@@ -1,0 +1,19 @@
+<orientation-study>
+ <header><span>From centreline to orientation</span><h3>Which way do the points spread?</h3><p>PCA finds the axis along which the centreline points vary most. Rotate the example to see that axis follow the points.</p></header>
+ <svg viewBox="0 0 640 280" role="img" aria-label="Centreline points, their mean, and the principal orientation axis"><path d="M45 140H595" stroke="#55505e" stroke-dasharray="4 6"/><text x="470" y="130" fill="#a89db4" font-size="12">Horizontal reference</text><g data-points fill="#eda981"></g><path data-axis stroke="#bda4ee" stroke-width="2" fill="none"/><circle cx="320" cy="140" r="5" fill="#f0e6fa"/><text x="328" y="163" fill="#c7bbd4" font-size="12">Mean of the points</text></svg>
+ <label>Rotate the centreline<input type="range" min="-60" max="60" value="20" step="1" aria-label="Centreline rotation in degrees"/></label>
+ <p class="orientation-result" aria-live="polite">Dominant orientation: <strong data-angle>20°</strong></p>
+ <p class="orientation-note">Peach dots: sampled centreline points. Lilac line: the PCA axis through their mean. This is an undirected axis—both ends describe the same orientation. It does not predict where the crack will grow.</p>
+</orientation-study>
+<style>
+orientation-study{display:block;padding:22px;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface);margin:25px 0}header span{font:10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#bca8e6}h3{font:24px Georgia,serif;margin:8px 0 12px}p{font-size:13px;line-height:1.75;color:#c6bccf}svg{width:100%;display:block;margin:12px 0}label{display:block;font-size:12px}input{width:100%;accent-color:#bca8e6;display:block;margin:14px 0}.orientation-result strong{color:#d0b8f0}.orientation-note{font-size:11px;margin-bottom:0}
+</style>
+<script>
+class OrientationStudy extends HTMLElement {
+ connectedCallback(){if(this.dataset.ready)return;this.dataset.ready='true';const slider=this.querySelector('input')!;
+ const update=()=>{const angle=Number(slider.value)*Math.PI/180;const raw=Array.from({length:25},(_,i)=>{const x=(i-12)*12,y=Math.sin(i*1.5)*7;return [x*Math.cos(angle)+y*Math.sin(angle),-x*Math.sin(angle)+y*Math.cos(angle)];});const mx=raw.reduce((s,p)=>s+p[0],0)/raw.length,my=raw.reduce((s,p)=>s+p[1],0)/raw.length;const points=raw.map(([x,y])=>[x-mx,y-my]);let xx=0,yy=0,xy=0;points.forEach(([x,y])=>{xx+=x*x;yy+=y*y;xy+=x*y;});const principal=.5*Math.atan2(2*xy,xx-yy);const dx=Math.cos(principal)*155,dy=Math.sin(principal)*155;
+ this.querySelector('[data-axis]')!.setAttribute('d',`M${320-dx} ${140-dy}L${320+dx} ${140+dy}`);const group=this.querySelector('[data-points]')!;group.replaceChildren();points.forEach(([x,y])=>{const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',String(320+x));dot.setAttribute('cy',String(140+y));dot.setAttribute('r','3');group.appendChild(dot);});this.querySelector('[data-angle]')!.textContent=`${(-principal*180/Math.PI).toFixed(1)}°`;};slider.addEventListener('input',update);update();
+ }
+}
+if(!customElements.get('orientation-study'))customElements.define('orientation-study',OrientationStudy);
+</script>
