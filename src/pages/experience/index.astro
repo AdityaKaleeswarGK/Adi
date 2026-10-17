@@ -16,8 +16,9 @@ import Experience from "../../components/Experience.astro";
 </BaseLayout>
 
 <style is:inline>
+  body:has(.experience-page) #main { padding-top:24px; }
   .experience-page { max-width:1180px; }
-  .experience-intro { margin:16px 0 35px; }
+  .experience-intro { margin:0 0 18px; }
   .experience-intro h1 { font:400 clamp(36px,4vw,46px)/1.2 Georgia,serif; letter-spacing:-1px; margin:0; }
   .experience-layout { display:grid; grid-template-columns:205px minmax(0,1fr); gap:55px; align-items:start; }
   .experience-index { position:sticky; top:35px; padding-top:12px; }
@@ -29,6 +30,6 @@ import Experience from "../../components/Experience.astro";
   .education-row { display:flex; justify-content:space-between; gap:25px; margin-top:25px; }
   .education-row h2 { font:28px/1.3 Georgia,serif; }.education-row p { margin-top:10px; font-size:13px; line-height:1.8; color:var(--color-muted); }
   .education-row>span { font:11px/2 var(--font-mono); color:var(--color-muted); text-align:right; }
-  @media(max-width:950px) { .experience-layout { grid-template-columns:1fr; gap:30px; }.experience-index { position:static; padding:0; }.experience-index nav { display:flex; flex-wrap:wrap; gap:8px 20px; }.experience-index nav p { display:none; }.experience-intro { margin-bottom:30px; } }
-  @media(max-width:600px) { .experience-intro { margin-top:12px; }.experience-index nav a { padding:5px 0; }.education-row { flex-direction:column; gap:16px; }.education-row>span { text-align:left; } }
+  @media(max-width:950px) { .experience-layout { grid-template-columns:1fr; gap:18px; }.experience-index { position:static; padding:0; }.experience-index nav { display:flex; flex-wrap:wrap; gap:8px 20px; }.experience-index nav p { display:none; } }
+  @media(max-width:600px) { .experience-index nav a { padding:5px 0; }.education-row { flex-direction:column; gap:16px; }.education-row>span { text-align:left; } }
 </style>
