@@ -9,10 +9,10 @@ export const site = {
   // Shown in the browser tab + footer.
   title: "Aditya Kaleeswar",
   // One-liner under your name on the homepage hero.
-  tagline: "Computer science graduate exploring robotics, machine learning, and language models.",
+  tagline: "Research in robotics, classical machine learning, embedded systems, and LLM evaluation.",
   // A slightly longer intro used on the homepage / about.
   intro:
-    "I’m Aditya, a computer science graduate exploring robotics, machine learning, and language models. I like building stuff.",
+    "I’m Aditya. I explore robotics, classical machine learning, embedded systems, and LLM evaluation. Open to research collaborations.",
 
   // Path to your résumé PDF (lives in /public). To update it, just replace
   // the file at public/resume.pdf — no code change needed.

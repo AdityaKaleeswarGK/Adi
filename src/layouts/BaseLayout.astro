@@ -9,9 +9,10 @@ import { site } from "../site.config";
 interface Props {
   title?: string;
   description?: string;
+  hideFooter?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, hideFooter = false } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : site.title;
 const pageDesc = description ?? site.tagline;
 // canonical/og:url/og:image only render once `site` is set in astro.config.mjs
@@ -54,7 +55,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
     <main id="main" class="flex-1 pt-4 pb-12 md:py-16">
       <slot />
     </main>
-    <Footer />
+    {!hideFooter && <Footer />}
     <CommandPalette />
 
     <script>
