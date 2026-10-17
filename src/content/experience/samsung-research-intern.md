@@ -1,6 +1,6 @@
 ---
 role: "PRISM Research Intern"
-org: "Samsung Research, Bangalore"
+org: "Samsung Research Bangalore"
 location: "Remote"
 start: "Oct 2024"
 end: "Jun 2025"

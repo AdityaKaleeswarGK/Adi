@@ -38,6 +38,7 @@ export const nav = [
   { label: "Home", href: "/" },
   { label: "Projects", href: "/projects" },
   { label: "Experience", href: "/experience" },
+  { label: "Research", href: "/research" },
   { label: "Blogs", href: "/blog" },
   { label: "Resume", href: "/resume" },
 ] as const;

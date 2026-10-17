@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { patents } from "../data/patents";
+---
+<BaseLayout title="Research" description="Research outputs and Indian patent applications by Aditya Kaleeswar.">
+  <div class="container-wide research-page">
+    <header class="research-heading"><h1>Research</h1></header>
+    <section id="patents" aria-labelledby="patents-heading">
+      <header class="research-section-heading"><h2 id="patents-heading">Patents</h2><p>Published Indian patent applications</p></header>
+      <ol class="patent-list">
+        {patents.map(patent => <li class="patent-entry">
+          <p class="patent-reference"><span>Application no.</span>{patent.number}</p>
+          <h3>{patent.title}</h3>
+        </li>)}
+      </ol>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .research-page { max-width:1060px; padding-bottom:50px; }
+  .research-heading { margin:16px 0 50px; }
+  .research-heading h1 { font:400 clamp(36px,4vw,46px)/1.2 Georgia,serif; letter-spacing:-1px; }
+  .research-section-heading { display:flex; flex-wrap:wrap; align-items:baseline; gap:12px 28px; padding-bottom:24px; border-bottom:1px solid var(--color-border); }
+  .research-section-heading h2 { font:28px/1.3 Georgia,serif; }
+  .research-section-heading p { font-size:12px; line-height:1.7; color:var(--color-muted); }
+  .patent-list { list-style:none; margin:0; padding:0; }
+  .patent-entry { display:grid; grid-template-columns:170px minmax(0,1fr); align-items:baseline; gap:30px; padding:30px 0; border-bottom:1px solid var(--color-border); }
+  .patent-reference { display:flex; flex-direction:column; gap:7px; font:12px/1.7 var(--font-mono); color:var(--color-accent); }
+  .patent-reference span { font:10px/1.7 var(--font-sans); color:var(--color-faint); }
+  .patent-entry h3 { font-size:17px; line-height:1.75; font-weight:400; }
+  @media(max-width:600px) { .research-heading { margin:12px 0 35px; }.patent-entry { grid-template-columns:1fr; gap:12px; padding:24px 0; }.patent-reference { flex-direction:row; flex-wrap:wrap; align-items:baseline; gap:10px; }.patent-entry h3 { font-size:15px; } }
+</style>
