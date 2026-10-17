@@ -1,16 +1,16 @@
 ---
-role: "Research Intern"
-org: "UTRGV — AIM Lab"
+role: "Machine Learning Research Intern"
+org: "University of Texas Rio Grande Valley, AIM Lab"
 location: "Remote"
 start: "Jan 2026"
 end: "Jul 2026"
-summary: "Replicate-aware learning for structural materials and physics-informed fracture assessment."
-order: 1
+order: 2
 links:
   - { label: "ECC overview", url: "https://adi-kaleez.vercel.app/projects/ecc" }
-  - { label: "PINN overview", url: "https://adi-kaleez.vercel.app/projects/pinn" }
+  - { label: "PINN research blog", url: "https://adi-kaleez.vercel.app/blog/pinn" }
 ---
-- Grouped **620 tensile tests into 276 unique mixes** to prevent composition leakage, then trained target-specific CatBoost quantile models for tensile stress and strain.
-- Calibrated nominal **80% prediction intervals**, reaching **80.4% stress** and **82.6% strain** coverage; connected the models to support-constrained NSGA-II inverse design.
-- Built a rover-image-to-fracture pipeline that segments cracks, extracts skeleton arc length and width, and calibrates image geometry for mechanics-based assessment.
-- Designed a mesh-free PINN with an embedded Williams crack-tip field. Recovered Mode I stress intensity within **approximately 6.5%** of an independent finite-element reference across five seeds.
+- Worked under **Prof. Jinwoo An**, collaborating with civil and chemical engineering researchers on materials prediction and crack assessment.
+- **ECC prediction:** developed CatBoost models to predict the tensile strength and ductility of engineered cementitious composites from their mix design. Grouped 620 tests into 276 unique mixes to prevent leakage between repeated tests of the same composition.
+- **Uncertainty and inverse design:** calibrated prediction intervals and connected the models to NSGA-II optimization for cost-efficient mix design, with constraints to keep recommendations within the supported data domain. Nominal 80% intervals achieved 80.4% stress and 82.6% strain coverage.
+- **Crack measurement:** built a replaceable vision front end that segments cracks, measures their paths, and uses MobileSAM to estimate member boundaries. Calibrated image measurements provide geometry for the physics backend, alongside supplied load and material properties.
+- **Physics-informed fracture modeling:** developed a mesh-free PINN with an embedded Williams crack-tip field to estimate Mode I stress intensity. Evaluated the mechanics solver separately from the vision pipeline, obtaining approximately 6.5% error against an independent finite-element reference in the five-seed reference experiment.

@@ -16,12 +16,8 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
           {item.data.location && <span class="career-location">{item.data.location}</span>}
         </div>
         <article class="career-work">
-          <header><h2>{item.data.org}</h2><p class="career-role">{item.data.role}</p></header>
-          {item.data.summary && <p class="career-summary">{item.data.summary}</p>}
+          <header><h2>{item.data.role}</h2><p class="career-org">{item.data.org}</p></header>
           <div class="career-contributions"><Body /></div>
-          {item.data.milestones.length > 0 && <ul class="career-milestones" aria-label="Career progression">
-            {item.data.milestones.map(m => <li><span>{m.date}</span>{m.label}{m.promotion && <span aria-label="Promotion"> ↑</span>}</li>)}
-          </ul>}
           {item.data.links.length > 0 && <nav class="career-links" aria-label={`${item.data.org} work links`}>
             {item.data.links.map(link => <a href={link.url} target="_blank" rel="noopener noreferrer">
               {link.url.includes('github.com/') ? <GitHubIcon class="career-link-icon" /> : <svg class="career-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6v20h12V6zM14 2v5h5M9 12h6M9 16h6"/></svg>}
@@ -43,9 +39,8 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
   .date-dash { color:var(--color-faint); line-height:1.2; }
   .career-location { display:block; margin-top:12px; font:11px/1.7 var(--font-sans); color:var(--color-faint); }
   .career-work h2 { font:400 clamp(23px,3vw,31px)/1.25 Georgia,serif; letter-spacing:-.5px; }
-  .career-role { font-size:13px; color:var(--color-accent); margin-top:10px; }
-  .career-summary { font-size:15px; line-height:1.8; margin:22px 0 18px; color:var(--color-fg); }
-  .career-contributions { color:var(--color-muted); font-size:14px; line-height:1.85; }
+  .career-org { font-size:14px; line-height:1.7; color:var(--color-accent); margin-top:10px; }
+  .career-contributions { color:var(--color-muted); font-size:14px; line-height:1.85; margin-top:22px; }
   .career-contributions :global(ul) { padding:0 0 0 16px; list-style:disc; }
   .career-contributions :global(li) { padding-left:5px; margin:12px 0; }
   .career-contributions :global(li::marker) { color:var(--color-faint); font-size:9px; }
@@ -54,7 +49,5 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
   .career-links a { display:inline-flex; gap:7px; align-items:center; color:var(--color-accent); font-size:11px; padding:5px 0; border-bottom:1px solid #abc7ff30; }
   .career-links a:hover { color:var(--color-fg); border-color:currentColor; }
   .career-links :global(.career-link-icon) { width:14px; height:14px; flex-shrink:0; }
-  .career-milestones { list-style:none; padding:12px 0 0; margin-top:18px; border-top:1px dashed var(--color-border); font-size:11px; line-height:1.8; color:var(--color-muted); }
-  .career-milestones li { padding:4px 0; }.career-milestones span:first-child { display:inline-block; width:80px; font:10px var(--font-mono); color:var(--color-accent); }
-  @media(max-width:650px) { .career-entry { grid-template-columns:1fr; gap:18px; padding:28px 0 35px; }.career-date { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }.career-index { margin:0 6px 0 0; }.career-date p { flex-direction:row; gap:8px; align-items:center; }.career-location { margin:0; }.career-work h2 { font-size:26px; }.career-summary { margin-top:18px; } }
+  @media(max-width:650px) { .career-entry { grid-template-columns:1fr; gap:18px; padding:28px 0 35px; }.career-date { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }.career-index { margin:0 6px 0 0; }.career-date p { flex-direction:row; gap:8px; align-items:center; }.career-location { margin:0; }.career-work h2 { font-size:26px; } }
 </style>

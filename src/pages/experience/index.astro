@@ -4,12 +4,12 @@ import Experience from "../../components/Experience.astro";
 ---
 <BaseLayout title="Experience" description="Research, engineering, and education — Aditya Kaleeswar.">
   <div class="container-wide experience-page">
-    <header class="experience-intro"><p class="eyebrow">Research & engineering</p><h1>Experience</h1><p>The teams, research, and projects I’ve been part of.</p></header>
+    <header class="experience-intro"><h1>Experience</h1></header>
     <div class="experience-layout">
-      <aside class="experience-index"><nav aria-label="On this page"><p class="eyebrow">On this page</p><a href="#research"><span>01</span> Research & engineering</a><a href="#education"><span>02</span> Education</a><a href="#patents"><span>03</span> Patent applications</a></nav><a class="index-resume" href="/resume">Full résumé ↗</a></aside>
+      <aside class="experience-index"><nav aria-label="On this page"><p class="eyebrow">On this page</p><a href="#research"><span>01</span> Roles</a><a href="#education"><span>02</span> Education</a><a href="#patents"><span>03</span> Patent applications</a></nav></aside>
       <div class="experience-main">
         <Experience />
-        <section id="education" class="experience-extra"><p class="eyebrow">02 / Education</p><div class="education-row"><div><h2>VIT Vellore</h2><p>B.Tech. in Computer Science and Engineering</p></div><span>Sep 2022 – Jul 2026<br/>Graduated</span></div></section>
+        <section id="education" class="experience-extra"><p class="eyebrow">02 / Education</p><div class="education-row"><div><h2>VIT Vellore</h2><p>B.Tech. in Computer Science and Engineering</p></div><span>Sep 2022 – Jul 2026</span></div></section>
         <section id="patents" class="experience-extra"><p class="eyebrow">03 / Published Indian patent applications</p>
           <article class="patent-row"><span class="patent-number">202641007500</span><h3>A Platform-Based System and Method for Force-Responsive Train State Detection</h3></article>
           <article class="patent-row"><span class="patent-number">202641058589</span><h3>An Adaptive Multi-Sensor Edge Computing Node for Autonomous Laboratory Safety Monitoring</h3></article>
@@ -21,15 +21,13 @@ import Experience from "../../components/Experience.astro";
 
 <style>
   .experience-page { max-width:1180px; }
-  .experience-intro { margin:24px 0 55px; }
-  .experience-intro h1 { font:400 clamp(46px,6vw,72px)/1.1 Georgia,serif; letter-spacing:-2px; margin:16px 0 20px; }
-  .experience-intro>p:last-child { font-size:15px; line-height:1.8; color:var(--color-muted); }
+  .experience-intro { margin:16px 0 35px; }
+  .experience-intro h1 { font:400 clamp(36px,4vw,46px)/1.2 Georgia,serif; letter-spacing:-1px; margin:0; }
   .experience-layout { display:grid; grid-template-columns:205px minmax(0,1fr); gap:55px; align-items:start; }
   .experience-index { position:sticky; top:35px; padding-top:12px; }
   .experience-index nav a { display:flex; gap:12px; padding:12px 0; color:var(--color-muted); font-size:11px; line-height:1.7; }
   .experience-index nav a span { font:10px/1.8 var(--font-mono); color:var(--color-faint); }
-  .experience-index nav a:hover,.index-resume:hover { color:var(--color-accent); }
-  .index-resume { display:inline-block; border-top:1px solid var(--color-border); padding-top:20px; margin-top:25px; color:var(--color-accent); font-size:12px; }
+  .experience-index nav a:hover { color:var(--color-accent); }
   .experience-main { min-width:0; }
   .experience-extra { padding:30px 0 40px; border-top:1px solid var(--color-border); scroll-margin-top:25px; }
   .education-row { display:flex; justify-content:space-between; gap:25px; margin-top:25px; }
@@ -37,6 +35,6 @@ import Experience from "../../components/Experience.astro";
   .education-row>span { font:11px/2 var(--font-mono); color:var(--color-muted); text-align:right; }
   .patent-row { display:grid; grid-template-columns:135px minmax(0,1fr); gap:20px; padding:25px 0; border-bottom:1px solid var(--color-border); }
   .patent-number { font:10px/1.9 var(--font-mono); color:var(--color-accent); }.patent-row h3 { font-size:14px; line-height:1.8; font-weight:400; }
-  @media(max-width:950px) { .experience-layout { grid-template-columns:1fr; gap:30px; }.experience-index { position:static; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:0; }.experience-index nav { display:flex; flex-wrap:wrap; gap:8px 20px; }.experience-index nav p { display:none; }.index-resume { border:0; margin:0; padding:0; white-space:nowrap; }.experience-intro { margin-bottom:30px; } }
-  @media(max-width:600px) { .experience-intro { margin-top:12px; }.experience-intro h1 { font-size:48px; }.experience-index { align-items:start; }.experience-index nav { flex-direction:column; gap:0; }.experience-index nav a { padding:5px 0; }.index-resume { padding-top:5px; }.education-row { flex-direction:column; gap:16px; }.education-row>span { text-align:left; }.patent-row { grid-template-columns:1fr; gap:8px; } }
+  @media(max-width:950px) { .experience-layout { grid-template-columns:1fr; gap:30px; }.experience-index { position:static; padding:0; }.experience-index nav { display:flex; flex-wrap:wrap; gap:8px 20px; }.experience-index nav p { display:none; }.experience-intro { margin-bottom:30px; } }
+  @media(max-width:600px) { .experience-intro { margin-top:12px; }.experience-index nav a { padding:5px 0; }.education-row { flex-direction:column; gap:16px; }.education-row>span { text-align:left; }.patent-row { grid-template-columns:1fr; gap:8px; } }
 </style>
