@@ -356,7 +356,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* Ink / ice: quiet content on a visible scroll-driven backdrop. */
 .home-content { position:relative; z-index:1; max-width:1060px; padding-bottom:65px; }
-main { min-width:0; width:100%; }
+main { position:relative; z-index:1; min-width:0; width:100%; }
 .home-content .intro-layout { grid-template-columns:minmax(0,1fr) 235px; align-items:start; gap:75px; padding:35px 0 66px; }
 .home-content .intro-layout>* { min-width:0; }
 .home-content .portrait { width:100%; margin-top:64px; padding:0; border:0; border-radius:3px; transform:rotate(2deg); box-shadow:12px 12px 0 #abc7ff0a; }

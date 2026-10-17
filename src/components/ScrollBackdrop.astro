@@ -12,10 +12,10 @@
 <style>
   .scroll-backdrop { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:#101218; --drift:0; }
   .terrain { position:absolute; width:115vmax; height:115vmax; stroke-width:.65; will-change:transform; }
-  .terrain-far { top:-42vmax; right:-28vmax; stroke:#94b8ef; opacity:.34; transform:translate3d(calc(var(--drift) * -42vw),calc(var(--drift) * 58vh),0) rotate(calc(var(--drift) * 38deg)); }
-  .terrain-near { top:30vh; left:-60vmax; stroke:#b6a3d6; opacity:.2; transform:translate3d(calc(var(--drift) * 36vw),calc(var(--drift) * -40vh),0) rotate(calc(var(--drift) * -28deg)); }
+  .terrain-far { top:-42vmax; right:-28vmax; stroke:#94b8ef; opacity:.34; transform:translate3d(calc(var(--drift) * -12vw),calc(var(--drift) * 14vh),0) rotate(calc(var(--drift) * 16deg)); }
+  .terrain-near { top:12vh; left:-55vmax; stroke:#b6a3d6; opacity:.24; transform:translate3d(calc(var(--drift) * 14vw),calc(var(--drift) * -16vh),0) rotate(calc(var(--drift) * -12deg)); }
   .backdrop-shade { position:absolute; inset:0; background:linear-gradient(90deg,#10121850,transparent 90%),radial-gradient(ellipse at 45% 50%,#101218a0,transparent 85%); }
-  @media(max-width:600px) { .terrain-far { opacity:.2; right:-65vmax; } .terrain-near { opacity:.12; } }
+  @media(max-width:600px) { .terrain-far { opacity:.25; right:-45vmax; } .terrain-near { opacity:.18; left:-62vmax; } }
   @media(prefers-reduced-motion:reduce) { .terrain { transform:none; will-change:auto; } }
 </style>
 

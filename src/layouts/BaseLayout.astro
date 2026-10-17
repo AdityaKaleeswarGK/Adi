@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import CommandPalette from "../components/CommandPalette.astro";
+import ScrollBackdrop from "../components/ScrollBackdrop.astro";
 import { site } from "../site.config";
 
 interface Props {
@@ -50,6 +51,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
     <ClientRouter />
   </head>
   <body class="flex min-h-screen flex-col">
+    <ScrollBackdrop />
     <a href="#main" class="skip-link">Skip to content</a>
     <Nav />
     <main id="main" class="flex-1 pt-4 pb-12 md:py-16">

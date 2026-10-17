@@ -1,13 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import FeaturedProjects from "../components/FeaturedProjects.astro";
 import { site } from "../site.config";
-import ScrollBackdrop from "../components/ScrollBackdrop.astro";
 import { getCollection } from "astro:content";
 const posts = await getCollection('blog', p => !p.data.draft && p.data.date <= new Date());
 ---
 <BaseLayout hideFooter>
-  <ScrollBackdrop />
   <div class="container-wide home-content">
     <section class="intro-layout">
       <div class="intro-copy">
@@ -32,12 +29,8 @@ const posts = await getCollection('blog', p => !p.data.draft && p.data.date <= n
       </div>
       <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
     </section>
-    <section id="work" class="editorial-section">
-      <div class="section-heading"><div><p class="eyebrow">01 / Selected work</p><h2>Things I’ve built.</h2></div><a href="/projects">Explore my GitHub projects ↗</a></div>
-      <FeaturedProjects/>
-    </section>
     <section class="editorial-section background-section">
-      <div><p class="eyebrow">02 / Along the way</p><h2>Experience</h2><a class="text-link" href="/experience">Experience & education ↗</a></div>
+      <div><p class="eyebrow">01 / Along the way</p><h2>Experience</h2><a class="text-link" href="/experience">Experience & education ↗</a></div>
       <div class="background-list">
         <div><span class="eyebrow">2026</span><h3>UTRGV · AIM Lab</h3><p>Research intern / uncertainty-aware ML & fracture mechanics</p></div>
         <div><span class="eyebrow">2024–2025</span><h3>Samsung Research · PRISM</h3><p>Research intern / multi-agent data visualization</p></div>
@@ -45,7 +38,7 @@ const posts = await getCollection('blog', p => !p.data.draft && p.data.date <= n
       </div>
     </section>
     <section class="editorial-section home-blogs">
-      <div class="section-heading"><div><p class="eyebrow">03 / Notes from the work</p><h2>Blogs</h2></div><a href="/blog">All posts ↗</a></div>
+      <div class="section-heading"><div><p class="eyebrow">02 / Notes from the work</p><h2>Blogs</h2></div><a href="/blog">All posts ↗</a></div>
       {posts.map(post => <a class="notebook-row" href={`/blog/${post.id}`}><div><h3>{post.data.title}</h3><p class="section-description">{post.data.description}</p></div><span>↗</span></a>)}
     </section>
   </div>
