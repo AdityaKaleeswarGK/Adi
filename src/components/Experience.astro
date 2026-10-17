@@ -20,7 +20,7 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
           <div class="career-contributions"><Body /></div>
           {item.data.links.length > 0 && <nav class="career-links" aria-label={`${item.data.org} work links`}>
             {item.data.links.map(link => <a href={link.url} target="_blank" rel="noopener noreferrer">
-              {link.url.includes('github.com/') ? <GitHubIcon class="career-link-icon" /> : <svg class="career-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6v20h12V6zM14 2v5h5M9 12h6M9 16h6"/></svg>}
+              {link.url.includes('github.com/') ? <GitHubIcon class="career-link-icon" size={14} /> : <svg class="career-link-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6v20h12V6zM14 2v5h5M9 12h6M9 16h6"/></svg>}
               {link.label}<span aria-hidden="true">↗</span>
             </a>)}
           </nav>}
@@ -30,7 +30,7 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
   </ol>
 </section>
 
-<style>
+<style is:inline>
   .career-list { list-style:none; margin:0; padding:0; }
   .career-entry { display:grid; grid-template-columns:130px minmax(0,1fr); gap:32px; border-top:1px solid var(--color-border); padding:36px 0 48px; scroll-margin-top:32px; }
   .career-date { font:11px/1.8 var(--font-mono); color:var(--color-muted); }
@@ -41,13 +41,13 @@ const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:e
   .career-work h2 { font:400 clamp(23px,3vw,31px)/1.25 Georgia,serif; letter-spacing:-.5px; }
   .career-org { font-size:14px; line-height:1.7; color:var(--color-accent); margin-top:10px; }
   .career-contributions { color:var(--color-muted); font-size:14px; line-height:1.85; margin-top:22px; }
-  .career-contributions :global(ul) { padding:0 0 0 16px; list-style:disc; }
-  .career-contributions :global(li) { padding-left:5px; margin:12px 0; }
-  .career-contributions :global(li::marker) { color:var(--color-faint); font-size:9px; }
-  .career-contributions :global(strong) { color:var(--color-fg); font-weight:500; }
+  .career-contributions ul { padding:0 0 0 16px; list-style:disc; }
+  .career-contributions li { padding-left:5px; margin:12px 0; }
+  .career-contributions li::marker { color:var(--color-faint); font-size:9px; }
+  .career-contributions strong { color:var(--color-fg); font-weight:500; }
   .career-links { display:flex; flex-wrap:wrap; gap:12px 22px; margin-top:24px; }
   .career-links a { display:inline-flex; gap:7px; align-items:center; color:var(--color-accent); font-size:11px; padding:5px 0; border-bottom:1px solid #abc7ff30; }
   .career-links a:hover { color:var(--color-fg); border-color:currentColor; }
-  .career-links :global(.career-link-icon) { width:14px; height:14px; flex-shrink:0; }
+  .career-links .career-link-icon { width:14px; height:14px; flex-shrink:0; }
   @media(max-width:650px) { .career-entry { grid-template-columns:1fr; gap:18px; padding:28px 0 35px; }.career-date { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }.career-index { margin:0 6px 0 0; }.career-date p { flex-direction:row; gap:8px; align-items:center; }.career-location { margin:0; }.career-work h2 { font-size:26px; } }
 </style>
