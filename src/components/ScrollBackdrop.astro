@@ -1,0 +1,50 @@
+<!-- A decorative, scroll-bound surface. No canvas, timers, or scroll capture. -->
+<div class="scroll-backdrop" aria-hidden="true">
+  <div class="backdrop-orbit orbit-one"></div>
+  <div class="backdrop-orbit orbit-two"></div>
+  <div class="backdrop-shade"></div>
+</div>
+
+<style>
+  .scroll-backdrop { position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; background:#111413; --drift:0; }
+  .backdrop-orbit { position:absolute; width:105vmax; height:105vmax; border-radius:45%; border:1px solid #a5c9ae1c; background:radial-gradient(ellipse at 60% 32%, #536d4926, #263b3012 43%, transparent 70%); will-change:transform; }
+  .orbit-one { left:24%; top:-72vmax; transform:translate3d(calc(var(--drift) * -16vw),calc(var(--drift) * 30vh),0) rotate(calc(var(--drift) * 65deg)); }
+  .orbit-two { right:30%; top:42vh; width:90vmax; height:90vmax; border-color:#9ab6c214; background:radial-gradient(ellipse at 65% 40%,#53748015,transparent 66%); transform:translate3d(calc(var(--drift) * 22vw),calc(var(--drift) * -36vh),0) rotate(calc(var(--drift) * -45deg)); }
+  .backdrop-shade { position:absolute; inset:0; background:linear-gradient(90deg,#11141370,transparent 70%); }
+  @media(max-width:600px) { .backdrop-orbit { opacity:.65; } }
+  @media(prefers-reduced-motion:reduce) { .backdrop-orbit { transform:none; will-change:auto; } }
+</style>
+
+<script>
+  let dispose: (() => void) | undefined;
+  const setupBackdrop = () => {
+    dispose?.();
+    const surface = document.querySelector<HTMLElement>('.scroll-backdrop');
+    if (!surface) return;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
+    const paint = () => {
+      frame = 0;
+      const range = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = range > 0 ? Math.max(0, Math.min(1, window.scrollY / range)) : 0;
+      // Smoothstep eases the shape into a resting position at either end.
+      surface.style.setProperty('--drift', String(motion.matches ? 0 : progress * progress * (3 - 2 * progress)));
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(paint); };
+    window.addEventListener('scroll', schedule, { passive:true });
+    window.addEventListener('resize', schedule);
+    motion.addEventListener('change', schedule);
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+    paint();
+    dispose = () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      motion.removeEventListener('change', schedule);
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  };
+  document.addEventListener('astro:page-load', setupBackdrop);
+  document.addEventListener('astro:before-swap', () => dispose?.());
+</script>

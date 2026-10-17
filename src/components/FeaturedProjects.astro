@@ -1,10 +1,8 @@
 ---
 import { work } from "../data/work";
-import WorkArt from "./WorkArt.astro";
 ---
 <div class="work-grid">
   {work.map(item => <article class="work-card">
-    <a class="work-art-link" href={`/projects/${item.slug}`} aria-label={`Explore ${item.title}`}><WorkArt kind={item.art}/></a>
     <div class="work-card-body">
       <p class="eyebrow">{item.number} / {item.field}</p>
       <h3><a href={`/projects/${item.slug}`}>{item.title} <span>↗</span></a></h3>

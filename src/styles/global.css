@@ -34,6 +34,7 @@ html {
 }
 
 body {
+  isolation: isolate;
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
