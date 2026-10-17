@@ -9,7 +9,7 @@ links:
   - { label: "Obstacle & pit avoidance (repo)", url: "https://github.com/AdityaKaleeswarGK/obstacle_pit_avoidance_using-pointcloud-process" }
   - { label: "Rover stack (repo)", url: "https://github.com/TeamVyadhVIT/strawberry_cheesecake" }
 ---
-- Engineered the autonomous navigation stack with **ROS 2 (Nav2)** and **SLAM**, implementing a **Frontier Exploration** algorithm to map unknown environments within dynamic GPS geofences.
-- Built a real-time **obstacle & pit avoidance** perception pipeline using **Intel RealSense D455** + **PCL**, with odometry-based path recovery and a custom PID alignment to compensate for wheel drift on uneven terrain.
-- Fused IMU + odometry with an **Extended Kalman Filter** to cut state-estimation noise, and built a telemetry GUI for Astro-Bio sensor streams (CO₂, IR, moisture).
-- Part of the team that placed **13th at the International Rover Challenge (IRC)** and **4th at the IRDC 2025**.
+- Engineered the autonomous navigation stack with ROS 2 (Nav2) and SLAM, implementing a Frontier Exploration algorithm to map unknown environments within dynamic GPS geofences.
+- Built a real-time obstacle & pit avoidance perception pipeline using Intel RealSense D455 + PCL, with odometry-based path recovery and a custom PID alignment to compensate for wheel drift on uneven terrain.
+- Fused IMU + odometry with an Extended Kalman Filter to cut state-estimation noise, and built a telemetry GUI for Astro-Bio sensor streams (CO₂, IR, moisture).
+- Part of the team that placed 13th at the International Rover Challenge (IRC) and 4th at the IRDC 2025.
