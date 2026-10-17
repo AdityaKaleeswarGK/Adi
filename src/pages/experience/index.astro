@@ -4,8 +4,9 @@ import Experience from "../../components/Experience.astro";
 ---
 <BaseLayout title="Experience" description="Research, engineering, and education — Aditya Kaleeswar.">
   <div class="container-wide experience-page">
+    <header class="experience-intro"><h1>Experience</h1></header>
     <div class="experience-layout">
-      <aside class="experience-index"><header class="experience-intro"><h1>Experience</h1></header><nav aria-label="On this page"><p class="eyebrow">On this page</p><a href="#research"><span>01</span> Roles</a><a href="#education"><span>02</span> Education</a></nav></aside>
+      <aside class="experience-index"><nav aria-label="On this page"><p class="eyebrow">On this page</p><a href="#research"><span>01</span> Roles</a><a href="#education"><span>02</span> Education</a></nav></aside>
       <div class="experience-main">
         <Experience />
         <section id="education" class="experience-extra"><p class="eyebrow">02 / Education</p><div class="education-row"><div><h2>VIT Vellore</h2><p>B.Tech. in Computer Science and Engineering</p></div><span>Sep 2022 – Jul 2026</span></div></section>
@@ -17,10 +18,10 @@ import Experience from "../../components/Experience.astro";
 <style is:inline>
   body:has(.experience-page) #main { padding-top:24px; }
   .experience-page { max-width:1180px; }
-  .experience-intro { margin:0 0 30px; }
-  .experience-intro h1 { font:400 31px/1.25 Georgia,serif; letter-spacing:-.5px; margin:0; }
+  .experience-intro { margin:0 0 18px; }
+  .experience-intro h1 { font:400 clamp(36px,4vw,46px)/1.2 Georgia,serif; letter-spacing:-1px; margin:0; }
   .experience-layout { display:grid; grid-template-columns:205px minmax(0,1fr); gap:55px; align-items:start; }
-  .experience-index { position:sticky; top:35px; }
+  .experience-index { position:sticky; top:35px; padding-top:12px; }
   .experience-index nav a { display:flex; gap:12px; padding:12px 0; color:var(--color-muted); font-size:11px; line-height:1.7; }
   .experience-index nav a span { font:10px/1.8 var(--font-mono); color:var(--color-faint); }
   .experience-index nav a:hover { color:var(--color-accent); }
