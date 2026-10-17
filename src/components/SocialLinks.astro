@@ -6,10 +6,12 @@ import { site } from "../site.config";
 interface Props {
   class?: string;
   linkClass?: string;
+  showEmailAddress?: boolean;
 }
 const {
   class: className = "flex items-center gap-6 text-muted",
   linkClass = "hover:text-accent transition-all hover:-translate-y-0.5 duration-200",
+  showEmailAddress = false,
 } = Astro.props;
 
 const links = [
@@ -47,10 +49,11 @@ const links = [
       class={linkClass}
       target={l.external ? "_blank" : undefined}
       rel={l.external ? "noopener noreferrer" : undefined}
-      aria-label={l.label}
+      aria-label={l.label === "Email" && showEmailAddress ? `Email ${site.links.email}` : l.label}
       title={l.label}
     >
       <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={l.icon} />
+      {l.label === "Email" && showEmailAddress && <span class="social-email-address">{site.links.email}</span>}
     </a>
   ))}
 </div>

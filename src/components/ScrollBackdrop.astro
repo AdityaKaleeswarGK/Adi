@@ -1,22 +1,17 @@
 <!-- A decorative, scroll-bound surface. No canvas, timers, or scroll capture. -->
 <div class="scroll-backdrop" aria-hidden="true">
-  <svg class="terrain terrain-far" viewBox="0 0 1000 1000" fill="none">
-    {Array.from({length:12}, (_, i) => <path d={`M ${420+i*28} -80 C ${120+i*25} ${170+i*9}, ${960-i*16} ${220+i*13}, ${700+i*19} ${510+i*13} S ${100+i*33} ${770+i*10}, ${360+i*28} 1150`}/>)}
-  </svg>
-  <svg class="terrain terrain-near" viewBox="0 0 1000 1000" fill="none">
-    {Array.from({length:9}, (_, i) => <path d={`M -100 ${180+i*38} C ${140+i*20} ${-100+i*24}, ${240+i*18} ${730-i*10}, ${570+i*18} ${510+i*29} S ${900+i*5} ${400+i*34}, 1200 ${780+i*24}`}/>)}
-  </svg>
-  <div class="backdrop-shade"></div>
+  <div class="light-field light-field-blue"></div>
+  <div class="light-field light-field-violet"></div>
+  <div class="backdrop-texture"></div>
 </div>
 
 <style>
-  .scroll-backdrop { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:#101218; --drift:0; }
-  .terrain { position:absolute; width:115vmax; height:115vmax; stroke-width:.65; will-change:transform; }
-  .terrain-far { top:-42vmax; right:-28vmax; stroke:#94b8ef; opacity:.34; transform:translate3d(calc(var(--drift) * -12vw),calc(var(--drift) * 14vh),0) rotate(calc(var(--drift) * 16deg)); }
-  .terrain-near { top:12vh; left:-55vmax; stroke:#b6a3d6; opacity:.24; transform:translate3d(calc(var(--drift) * 14vw),calc(var(--drift) * -16vh),0) rotate(calc(var(--drift) * -12deg)); }
-  .backdrop-shade { position:absolute; inset:0; background:linear-gradient(90deg,#10121850,transparent 90%),radial-gradient(ellipse at 45% 50%,#101218a0,transparent 85%); }
-  @media(max-width:600px) { .terrain-far { opacity:.25; right:-45vmax; } .terrain-near { opacity:.18; left:-62vmax; } }
-  @media(prefers-reduced-motion:reduce) { .terrain { transform:none; will-change:auto; } }
+  .scroll-backdrop { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:var(--color-bg); --drift:0; }
+  .light-field { position:absolute; inset:-25%; will-change:transform; }
+  .light-field-blue { background:radial-gradient(ellipse at 85% 20%,#436caa40,transparent 48%); transform:translate3d(calc(var(--drift) * -12vw),calc(var(--drift) * 18vh),0); }
+  .light-field-violet { background:radial-gradient(ellipse at 12% 85%,#69527e29,transparent 48%); transform:translate3d(calc(var(--drift) * 10vw),calc(var(--drift) * -15vh),0); }
+  .backdrop-texture { position:absolute; inset:0; opacity:.14; background-image:radial-gradient(#b4bdd04d .5px,transparent .5px); background-size:5px 5px; mask-image:linear-gradient(90deg,transparent 25%,#000); }
+  @media(prefers-reduced-motion:reduce) { .light-field { transform:none; will-change:auto; } }
 </style>
 
 <script>

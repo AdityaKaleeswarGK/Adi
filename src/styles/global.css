@@ -367,10 +367,12 @@ main { position:relative; z-index:1; min-width:0; width:100%; }
 .home-content .intro-text strong { font-weight:500; color:var(--color-fg); }
 .intro-current { font-size:13px; line-height:1.8; margin-top:26px; color:var(--color-accent); }
 .intro-collaboration { font-size:14px; line-height:1.8; color:var(--color-muted); margin-top:10px; }
-.intro-socials { display:flex; flex-wrap:wrap; gap:12px 24px; margin-top:24px; font-size:13px; }
-.intro-socials a { padding:5px 0; border-bottom:1px solid #abc7ff35; transition:color .2s; }
+.intro-socials { display:flex; flex-wrap:wrap; align-items:center; gap:14px 22px; margin-top:24px; font-size:13px; }
+.intro-socials a { display:inline-flex; align-items:center; gap:10px; padding:6px 0; transition:color .2s; }
+.intro-socials svg { flex-shrink:0; width:20px; height:20px; }
 .intro-socials a:hover { color:var(--color-accent); }
-.intro-socials span { color:var(--color-faint); font-size:11px; margin-left:4px; }
+.intro-socials .social-email-address { color:var(--color-muted); font-size:13px; overflow-wrap:anywhere; }
+.intro-socials a:focus-visible { outline:2px solid var(--color-accent); outline-offset:5px; border-radius:2px; }
 .home-content .personal-reminder { margin-top:20px; }
 .home-content .personal-reminder summary { font-size:11px; }
 .home-content .editorial-section { padding-top:38px; border-top:1px solid var(--color-border); }
