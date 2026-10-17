@@ -1,17 +1,24 @@
 <!-- A decorative, scroll-bound surface. No canvas, timers, or scroll capture. -->
 <div class="scroll-backdrop" aria-hidden="true">
-  <div class="light-field light-field-blue"></div>
-  <div class="light-field light-field-violet"></div>
-  <div class="backdrop-texture"></div>
+  <div class="backdrop-light"></div>
+  <svg class="ribbon ribbon-blue" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" fill="none">
+    <path d="M1050 -600 C260 -20 150 400 860 740 S1880 1280 980 1800 L1240 1900 C2200 1050 1380 740 1010 560 S660 100 1430 -420 Z" />
+  </svg>
+  <svg class="ribbon ribbon-violet" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" fill="none">
+    <path d="M-650 150 C-150 0 120 250 180 650 S620 1160 1670 850 L1720 990 C500 1450 -30 1050 -10 670 S-260 220 -650 350 Z" />
+  </svg>
 </div>
 
 <style>
   .scroll-backdrop { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:var(--color-bg); --drift:0; }
-  .light-field { position:absolute; inset:-25%; will-change:transform; }
-  .light-field-blue { background:radial-gradient(ellipse at 85% 20%,#436caa40,transparent 48%); transform:translate3d(calc(var(--drift) * -12vw),calc(var(--drift) * 18vh),0); }
-  .light-field-violet { background:radial-gradient(ellipse at 12% 85%,#69527e29,transparent 48%); transform:translate3d(calc(var(--drift) * 10vw),calc(var(--drift) * -15vh),0); }
-  .backdrop-texture { position:absolute; inset:0; opacity:.14; background-image:radial-gradient(#b4bdd04d .5px,transparent .5px); background-size:5px 5px; mask-image:linear-gradient(90deg,transparent 25%,#000); }
-  @media(prefers-reduced-motion:reduce) { .light-field { transform:none; will-change:auto; } }
+  .backdrop-light { position:absolute; inset:0; background:radial-gradient(ellipse at 90% 20%,#25364a55,transparent 65%); }
+  .ribbon { position:absolute; top:-20%; left:-20%; width:140%; height:140%; will-change:transform; }
+  .ribbon-blue { transform:translate3d(calc(var(--drift) * -10vw),calc(var(--drift) * 8vh),0) rotate(calc(var(--drift) * 15deg)); }
+  .ribbon-blue path { fill:#263a5666; stroke:#88aee84d; stroke-width:1; }
+  .ribbon-violet { transform:translate3d(calc(var(--drift) * 9vw),calc(var(--drift) * -12vh),0) rotate(calc(var(--drift) * -12deg)); }
+  .ribbon-violet path { fill:#39324640; stroke:#a498c433; stroke-width:1; }
+  @media(max-width:600px) { .ribbon-blue path { fill:#263a564a; }.ribbon-violet path { fill:#39324630; } }
+  @media(prefers-reduced-motion:reduce) { .ribbon { transform:none; will-change:auto; } }
 </style>
 
 <script>

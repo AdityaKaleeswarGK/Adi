@@ -1,137 +1,60 @@
 ---
-// Experience: a vertical timeline of roles. Each card shows the role, summary
-// and its projects/preprints as link chips; clicking the card expands the full
-// story inline (accordion — no modal). Content: src/content/experience/.
 import { getCollection, render } from "astro:content";
 import GitHubIcon from "./GitHubIcon.astro";
-
-const entries = (await getCollection("experience")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const items = await Promise.all(
-  entries.map(async (e) => ({ data: e.data, Content: (await render(e)).Content })),
-);
-
-// preprints / papers / docs get a document icon; everything else gets GitHub
-const isPaper = (label: string) => /preprint|paper|thesis|docs/i.test(label);
+const entries = (await getCollection("experience")).sort((a,b) => a.data.order - b.data.order);
+const items = await Promise.all(entries.map(async entry => ({id:entry.id, data:entry.data, Content:(await render(entry)).Content})));
 ---
 
-{
-  items.length > 0 && (
-    <section id="experience">
-      <ol class="relative ml-1 border-l border-border">
-        {items.map((it, i) => {
-          const Body = it.Content;
-          return (
-            <li class="relative ml-4 pb-8 pl-6 last:pb-0">
-              <span class="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-2 border-bg bg-accent" />
+<section id="research" aria-label="Research and engineering roles">
+  <ol class="career-list">
+    {items.map((item,i) => {
+      const Body = item.Content;
+      return <li class="career-entry" id={item.id}>
+        <div class="career-date">
+          <span class="career-index">0{i+1}</span>
+          <p>{item.data.start}<span class="date-dash">—</span>{item.data.end}</p>
+          {item.data.location && <span class="career-location">{item.data.location}</span>}
+        </div>
+        <article class="career-work">
+          <header><h2>{item.data.org}</h2><p class="career-role">{item.data.role}</p></header>
+          {item.data.summary && <p class="career-summary">{item.data.summary}</p>}
+          <div class="career-contributions"><Body /></div>
+          {item.data.milestones.length > 0 && <ul class="career-milestones" aria-label="Career progression">
+            {item.data.milestones.map(m => <li><span>{m.date}</span>{m.label}{m.promotion && <span aria-label="Promotion"> ↑</span>}</li>)}
+          </ul>}
+          {item.data.links.length > 0 && <nav class="career-links" aria-label={`${item.data.org} work links`}>
+            {item.data.links.map(link => <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.url.includes('github.com/') ? <GitHubIcon class="career-link-icon" /> : <svg class="career-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6v20h12V6zM14 2v5h5M9 12h6M9 16h6"/></svg>}
+              {link.label}<span aria-hidden="true">↗</span>
+            </a>)}
+          </nav>}
+        </article>
+      </li>;
+    })}
+  </ol>
+</section>
 
-              <article
-                class="exp-card group card-hover reveal cursor-pointer rounded-2xl border border-border bg-surface p-6 transition-all duration-200"
-                data-exp-toggle
-                tabindex="0"
-                role="button"
-                aria-expanded="false"
-                aria-controls={`exp-body-${i}`}
-                aria-label={`${it.data.role} at ${it.data.org} — toggle details`}
-              >
-                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h3 class="text-lg font-semibold text-fg">{it.data.role}</h3>
-                  <time class="font-mono text-xs text-accent">{it.data.start} – {it.data.end}</time>
-                </div>
-                <p class="mt-0.5 text-sm text-muted">
-                  {it.data.org}
-                  {it.data.location ? ` · ${it.data.location}` : ""}
-                </p>
-
-                {it.data.summary && (
-                  <p class="mt-3 text-sm leading-relaxed text-faint">{it.data.summary}</p>
-                )}
-
-                {it.data.links.length > 0 && (
-                  <div class="mt-4 flex flex-wrap gap-2">
-                    {it.data.links.map((l) => (
-                      <a
-                        href={l.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
-                      >
-                        {isPaper(l.label) ? (
-                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                        ) : (
-                          <GitHubIcon class="h-3.5 w-3.5" />
-                        )}
-                        {l.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-
-                <div class="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
-                  <span class="text-faint">the full story, bullet by bullet</span>
-                  <span class="link-accent inline-flex items-center gap-1.5 font-medium">
-                    <span class="exp-more">Expand</span>
-                    <span class="exp-less">Collapse</span>
-                    <svg class="exp-caret h-3.5 w-3.5 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                  </span>
-                </div>
-
-                {/* inline expandable story (animated via grid-template-rows) */}
-                <div id={`exp-body-${i}`} class="exp-body">
-                  <div class="exp-body-clip">
-                    {it.data.milestones.length > 0 && (
-                      <div class="mt-5 flex flex-wrap gap-2">
-                        {it.data.milestones.map((m) => (
-                          <span
-                            class:list={[
-                              "tag text-xs",
-                              m.promotion ? "border-accent/50 text-accent" : "",
-                            ]}
-                          >
-                            <span class="mr-1.5 font-mono text-[10px] text-faint">{m.date}</span>
-                            {m.label}
-                            {m.promotion && " ↑"}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div class="exp-panel prose mt-5">
-                      <Body />
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  )
-}
-
-<script>
-  // Fully delegated (document-level) so it works on any load path —
-  // initial load, view-transition swap, or bfcache restore — with no re-binding.
-  function toggle(card: HTMLElement) {
-    const open = card.classList.toggle("is-open");
-    card.setAttribute("aria-expanded", String(open));
-  }
-
-  document.addEventListener("click", (e) => {
-    const t = e.target as Element | null;
-    // links navigate; clicks inside the opened story are for reading, not toggling
-    if (!t || t.closest?.("a") || t.closest?.(".exp-body")) return;
-    const card = t.closest?.("[data-exp-toggle]") as HTMLElement | null;
-    if (card) toggle(card);
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    const card = (e.target as Element | null)?.closest?.("[data-exp-toggle]") as HTMLElement | null;
-    if (card && e.target === card) {
-      e.preventDefault();
-      toggle(card);
-    }
-  });
-</script>
+<style>
+  .career-list { list-style:none; margin:0; padding:0; }
+  .career-entry { display:grid; grid-template-columns:130px minmax(0,1fr); gap:32px; border-top:1px solid var(--color-border); padding:36px 0 48px; scroll-margin-top:32px; }
+  .career-date { font:11px/1.8 var(--font-mono); color:var(--color-muted); }
+  .career-index { display:block; color:var(--color-accent); font-size:10px; margin-bottom:24px; }
+  .career-date p { display:flex; flex-direction:column; }
+  .date-dash { color:var(--color-faint); line-height:1.2; }
+  .career-location { display:block; margin-top:12px; font:11px/1.7 var(--font-sans); color:var(--color-faint); }
+  .career-work h2 { font:400 clamp(23px,3vw,31px)/1.25 Georgia,serif; letter-spacing:-.5px; }
+  .career-role { font-size:13px; color:var(--color-accent); margin-top:10px; }
+  .career-summary { font-size:15px; line-height:1.8; margin:22px 0 18px; color:var(--color-fg); }
+  .career-contributions { color:var(--color-muted); font-size:14px; line-height:1.85; }
+  .career-contributions :global(ul) { padding:0 0 0 16px; list-style:disc; }
+  .career-contributions :global(li) { padding-left:5px; margin:12px 0; }
+  .career-contributions :global(li::marker) { color:var(--color-faint); font-size:9px; }
+  .career-contributions :global(strong) { color:var(--color-fg); font-weight:500; }
+  .career-links { display:flex; flex-wrap:wrap; gap:12px 22px; margin-top:24px; }
+  .career-links a { display:inline-flex; gap:7px; align-items:center; color:var(--color-accent); font-size:11px; padding:5px 0; border-bottom:1px solid #abc7ff30; }
+  .career-links a:hover { color:var(--color-fg); border-color:currentColor; }
+  .career-links :global(.career-link-icon) { width:14px; height:14px; flex-shrink:0; }
+  .career-milestones { list-style:none; padding:12px 0 0; margin-top:18px; border-top:1px dashed var(--color-border); font-size:11px; line-height:1.8; color:var(--color-muted); }
+  .career-milestones li { padding:4px 0; }.career-milestones span:first-child { display:inline-block; width:80px; font:10px var(--font-mono); color:var(--color-accent); }
+  @media(max-width:650px) { .career-entry { grid-template-columns:1fr; gap:18px; padding:28px 0 35px; }.career-date { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }.career-index { margin:0 6px 0 0; }.career-date p { flex-direction:row; gap:8px; align-items:center; }.career-location { margin:0; }.career-work h2 { font-size:26px; }.career-summary { margin-top:18px; } }
+</style>
