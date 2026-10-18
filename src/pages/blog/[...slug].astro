@@ -17,7 +17,7 @@ const fmt = (d: Date) =>
 const readMins = post.data.readingMinutes ?? Math.max(1, Math.round((post.body ?? "").split(/\s+/).length / 220));
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description}>
+<BaseLayout title={post.data.title} description={post.data.description} animatedBackground={false}>
   <div class="scroll-progress" aria-hidden="true"></div>
 
   <article class="container-tight">

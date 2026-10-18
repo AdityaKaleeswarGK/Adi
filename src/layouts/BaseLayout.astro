@@ -11,9 +11,10 @@ interface Props {
   title?: string;
   description?: string;
   hideFooter?: boolean;
+  animatedBackground?: boolean;
 }
 
-const { title, description, hideFooter = false } = Astro.props;
+const { title, description, hideFooter = false, animatedBackground = true } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : site.title;
 const pageDesc = description ?? site.tagline;
 // canonical/og:url/og:image only render once `site` is set in astro.config.mjs
@@ -51,7 +52,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
     <ClientRouter />
   </head>
   <body class="flex min-h-screen flex-col">
-    <ScrollBackdrop />
+    {animatedBackground && <ScrollBackdrop />}
     <a href="#main" class="skip-link">Skip to content</a>
     <Nav />
     <main id="main" class="flex-1 pt-4 pb-12 md:py-16">

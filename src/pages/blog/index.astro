@@ -3,7 +3,7 @@ import {getCollection} from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 const posts=(await getCollection('blog',p=>!p.data.draft && p.data.date<=new Date())).sort((a,b)=>+b.data.date-+a.data.date);
 ---
-<BaseLayout title="Blogs" description="Research notes, project stories, and experiments from Aditya Kaleeswar.">
+<BaseLayout title="Blogs" description="Research notes, project stories, and experiments from Aditya Kaleeswar." animatedBackground={false}>
 <div class="container-tight"><header class="page-intro"><h1>Blogs</h1><p>Project write-ups and research notes.</p></header>
 {posts.length>0 && <section aria-label="Published writing">{posts.map(p=><a class="notebook-row" href={p.data.url??`/blog/${p.id}`}><span class="eyebrow">{p.data.date.toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</span><div><h2>{p.data.title}</h2><p class="mt-2 text-sm text-muted">{p.data.description}</p></div><span>↗</span></a>)}</section>}
 </div>
