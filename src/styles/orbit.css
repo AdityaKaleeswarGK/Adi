@@ -174,3 +174,16 @@ html[data-sky="off"] #sky { display: none; }
   .hl-grid::-webkit-scrollbar { display: none; }
   .hl { flex: 0 0 78%; scroll-snap-align: start; }
 }
+
+/* ─── blog list ──────────────────────────────────────────────────────────── */
+.b-list { padding: 4px 26px; }
+.b-row { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 8px 24px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,.07); color: var(--color-fg); }
+.b-row:last-child { border-bottom: 0; }
+.b-date { font: 12px var(--font-mono); color: var(--color-accent); }
+.b-body { display: flex; flex-direction: column; gap: 8px; }
+.b-title { font-size: 19px; font-weight: 600; line-height: 1.4; }
+.b-desc { font-size: 15px; line-height: 1.6; color: var(--color-muted); }
+.b-arrow { color: var(--color-accent); transition: transform .2s; }
+.b-row:hover .b-title { color: var(--color-accent-hover); }
+.b-row:hover .b-arrow { transform: translate(3px, -3px); }
+@media (max-width: 600px) { .b-list { padding: 4px 18px; } .b-row { grid-template-columns: 1fr auto; } .b-date { grid-column: 1 / -1; } }
