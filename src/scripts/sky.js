@@ -225,7 +225,18 @@ class Sky {
       pulse *= pulse;
       if (pt >= 1) this.pulseT = null;
     }
-    this.spin += 0.18 * pulse;
+    // the two outer bands turn against each other by a third of a circle and settle; the
+    // 30° rasi and 13⅓° nakshatra marks both repeat every 120°, so the dial comes to rest
+    // looking exactly as before and the chart stays true
+    this.rotA = 0; this.rotB = 0;
+    if (this.ringT != null) {
+      this.ringT += dt;
+      var rt = Math.min(1, this.ringT / 1.2);
+      var re = rt < 0.5 ? 4 * rt * rt * rt : 1 - Math.pow(-2 * rt + 2, 3) / 2;
+      this.rotA = 120 * re;
+      this.rotB = -120 * re;
+      if (rt >= 1) { this.ringT = null; this.rotA = 0; this.rotB = 0; }
+    }
     // after it lands: planets brighten, rings step back
     this.settle = smooth((this.elapsed - this.journeySec) / this.settleSec);
     var speed = 0.02 + 0.16 * pulse;
@@ -301,7 +312,7 @@ class Sky {
     ctx.lineWidth = 1;
     for (var q = 0; q < 108; q++) {
       var lon = q * 10 / 3, isNak = q % 4 === 0;
-      var a1 = this.project(this.local(lon, 1, R)), b1 = this.project(this.local(lon, isNak ? 1.08 : 1.025, R));
+      var a1 = this.project(this.local(lon + (this.rotA || 0), 1, R)), b1 = this.project(this.local(lon + (this.rotA || 0), isNak ? 1.08 : 1.025, R));
       ctx.strokeStyle = isNak ? 'rgba(220,224,236,0.6)' : 'rgba(220,224,236,0.28)';
       ctx.beginPath(); ctx.moveTo(a1[0], a1[1]); ctx.lineTo(b1[0], b1[1]); ctx.stroke();
     }
@@ -318,7 +329,7 @@ class Sky {
     rim(y3, 1.15, 2.4, 'rgba(242,193,78,0.6)', 'rgba(120,130,190,0.08)');
     ctx.lineWidth = 1;
     for (var r = 0; r < 12; r++) {
-      var a2 = this.project(this.local(r * 30, 1.08, R)), b2 = this.project(this.local(r * 30, 1.15, R));
+      var a2 = this.project(this.local(r * 30 + (this.rotB || 0), 1.08, R)), b2 = this.project(this.local(r * 30 + (this.rotB || 0), 1.15, R));
       ctx.strokeStyle = 'rgba(242,193,78,0.7)';
       ctx.beginPath(); ctx.moveTo(a2[0], a2[1]); ctx.lineTo(b2[0], b2[1]); ctx.stroke();
     }
@@ -360,7 +371,7 @@ export function startSky(canvas) {
   sky.init();
   window.__sky = sky;
   var place = function () { if (sky.w) sky.cur = sky.layoutFor(sky.page); };
-  document.addEventListener('astro:before-preparation', function () { if (!sky.reduced) sky.pulseT = 0; });
+  document.addEventListener('astro:before-preparation', function () { if (!sky.reduced) { sky.pulseT = 0; sky.ringT = 0; } });
   document.addEventListener('astro:page-load', place);
   window.addEventListener('load', place);
   return sky;
