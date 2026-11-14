@@ -1,0 +1,50 @@
+---
+// Phones only: a round button in the bottom-right corner, where the thumb already rests.
+// Tapping it fans the pages out in a column just above it along the right edge,
+// leaving the rest of the screen visible.
+import { nav } from "../site.config";
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+// nearest the thumb first: the column grows upward from the button
+const items = [...nav].reverse();
+---
+<div class="thumb" data-thumb>
+  <ul id="thumb-list" class="thumb-list" aria-label="Pages">
+    {items.map((item, i) => (
+      <li style={`--i:${items.length - 1 - i}`}>
+        <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}</a>
+      </li>
+    ))}
+  </ul>
+  <button type="button" class="thumb-btn" aria-expanded="false" aria-controls="thumb-list" aria-label="Open menu">
+    <span class="thumb-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</div>
+
+<script>
+  // One set of listeners for the whole visit; the menu markup is swapped on every navigation.
+  const close = () => {
+    const root = document.querySelector<HTMLElement>("[data-thumb]");
+    if (!root) return;
+    root.classList.remove("is-open");
+    root.querySelector(".thumb-btn")?.setAttribute("aria-expanded", "false");
+    root.querySelector(".thumb-btn")?.setAttribute("aria-label", "Open menu");
+  };
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
+    const root = document.querySelector<HTMLElement>("[data-thumb]");
+    if (!root || !target) return;
+    if (target.closest(".thumb-btn")) {
+      const open = !root.classList.contains("is-open");
+      root.classList.toggle("is-open", open);
+      const btn = root.querySelector(".thumb-btn");
+      btn?.setAttribute("aria-expanded", String(open));
+      btn?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      return;
+    }
+    // tapping a page, or anywhere else, folds the menu away
+    if (root.classList.contains("is-open")) close();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  document.addEventListener("astro:after-swap", close);
+</script>
