@@ -9,7 +9,10 @@ html[data-sky="on"], html[data-sky="on"] body { background: var(--color-bg); }
 html[data-sky="off"] #sky { display: none; }
 
 /* ─── header ─────────────────────────────────────────────────────────────── */
-.orbit-header { position: sticky; top: 0; z-index: 30; background: linear-gradient(rgba(3,4,9,.92), rgba(3,4,9,.72)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
+/* the header floats over the sky: no bar behind it, so the chakra shows through */
+.orbit-header { position: sticky; top: 0; z-index: 30; background: transparent; pointer-events: none; }
+.orbit-header a, .orbit-header button, .orbit-pill { pointer-events: auto; }
+.orbit-wordmark { text-shadow: 0 1px 10px rgba(3,4,9,.9); }
 .orbit-nav { max-width: 1180px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px; }
 .orbit-nav .side { flex: 1 1 0; min-width: 110px; display: flex; }
 .orbit-nav .side.end { justify-content: flex-end; }
