@@ -8,14 +8,16 @@ import { highlights } from "../data/projects";
   <div class="orbit-page">
     <div class="home-grid">
       <aside class="home-aside" aria-label="Profile">
-        <img class="home-photo" src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high" />
+        <img id="sky-anchor" class="home-photo" src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high" />
         <GitHubRing />
       </aside>
 
       <div class="home-main">
-        <div>
+        <div class="home-head">
           <h1 class="home-hello">Hey, I’m <em>Aditya.</em></h1>
           <p class="home-handle">@{site.githubUsername} · CS, VIT Vellore · Chennai</p>
+        </div>
+        <div>
           <div class="home-intro">
             <p>I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans <span class="kw">robotics</span>, <span class="kw">machine learning</span>, and <span class="kw">embedded systems</span>.</p>
             <p>Recently, my ML research has focused on the <span class="kw">coding abilities of language models</span>. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about <span class="kw">specification gaming</span> and <span class="kw">mechanistic interpretability</span>, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>

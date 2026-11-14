@@ -123,6 +123,18 @@ class Sky {
   // the chakra sits in the centre of every page, as large as fits with its whole rim on screen
   layoutFor(page) {
     var w = this.w, h = this.h;
+    // phones: a smaller chakra centred on the page's anchor (the round photo on the home page),
+    // so on landing it sits around you; it stays fixed there as the content scrolls over it
+    if (w < 700) {
+      var Rm = Math.min(w * 0.40, h * 0.24);
+      var anchor = document.getElementById('sky-anchor');
+      if (anchor) {
+        var r = anchor.getBoundingClientRect();
+        var y = r.top + (window.scrollY || 0) + r.height / 2;
+        if (r.height > 0) return { x: w / 2, y: y, R: Rm };
+      }
+      return { x: w / 2, y: h * 0.42, R: Rm };
+    }
     var R = (Math.min(w, h - 120) / 2 - 8) / 1.2;
     return { x: w / 2, y: h / 2 + 20, R: Math.max(80, R) };
   }
@@ -336,5 +348,8 @@ export function startSky(canvas) {
   var sky = new Sky(canvas);
   sky.init();
   window.__sky = sky;
+  var place = function () { if (sky.w) sky.cur = sky.layoutFor(sky.page); };
+  document.addEventListener('astro:page-load', place);
+  window.addEventListener('load', place);
   return sky;
 }
