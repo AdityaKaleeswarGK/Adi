@@ -30,7 +30,7 @@ const items: Item[] = [
     hint: n.href,
     action: "go" as const,
     value: n.href,
-    icon: n.label === "Resume" ? fileIcon : pageIcon,
+    icon: n.href === "/resume" ? fileIcon : pageIcon,
   })),
   {
     label: "Copy email",

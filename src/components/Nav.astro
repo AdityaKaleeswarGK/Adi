@@ -1,11 +1,18 @@
 ---
 import { nav, site } from "../site.config";
 const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 ---
-<header class="site-header">
-  <nav class="container-wide navigation" aria-label="Main">
-    <a href="/" class="wordmark" aria-label={`${site.name} — home`}><span lang="ta" style="color:inherit;letter-spacing:normal">ஆதித்யா</span></a>
-    <ul class="nav-items">{nav.map(item => <li><a href={item.href} aria-current={(item.href === '/' ? path === '/' : path.startsWith(item.href)) ? 'page' : undefined}>{item.label}</a></li>)}</ul>
-    <button id="cmdk-hint" class="search-shortcut" aria-label="Open command palette">⌘ K</button>
+<header class="orbit-header" transition:animate="none">
+  <nav class="orbit-nav" aria-label="Main">
+    <div class="side">
+      <a href="/" class="orbit-wordmark" lang="ta" aria-label={`${site.name} — home`}>ஆதித்யா</a>
+    </div>
+    <div class="orbit-pill">
+      {nav.map((item) => <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}</a>)}
+    </div>
+    <div class="side end">
+      <button id="cmdk-hint" type="button" class="orbit-k" aria-label="Open command palette">⌘ K</button>
+    </div>
   </nav>
 </header>

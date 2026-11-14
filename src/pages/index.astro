@@ -1,30 +1,56 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import GitHubRing from "../components/GitHubRing.astro";
 import { site } from "../site.config";
-import SocialLinks from "../components/SocialLinks.astro";
-import { getCollection } from "astro:content";
-const posts = await getCollection('blog', p => !p.data.draft && p.data.date <= new Date());
+import { highlights } from "../data/projects";
 ---
 <BaseLayout hideFooter>
-  <div class="container-wide home-content">
-    <section class="intro-layout">
-      <div class="intro-copy">
-        <h1>Hey, I’m Aditya.</h1>
-        <p class="intro-text">I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans robotics, machine learning, and embedded systems. Recently, my ML research has focused on the coding abilities of language models. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about specification gaming and mechanistic interpretability, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>
-        <p class="intro-collaboration">Feel free to contact me regarding my work and collaborations.</p>
-        <SocialLinks class="intro-socials" linkClass="intro-social-link" showEmailAddress />
-        <details class="personal-reminder">
-          <summary>A reminder I keep <span aria-hidden="true">+</span></summary>
-          <div class="reminder-image">
-            <img src="/keep-building.jpeg" alt="Raptor 1 and Raptor 3 side by side, with the message: First you make it work. Then you can always make it beautiful." width="1206" height="1425" loading="lazy" decoding="async" />
+  <div class="orbit-page">
+    <div class="home-grid">
+      <aside class="home-aside" aria-label="Profile">
+        <img class="home-photo" src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high" />
+        <GitHubRing />
+      </aside>
+
+      <div class="home-main">
+        <div>
+          <h1 class="home-hello">Hey, I’m <em>Aditya.</em></h1>
+          <p class="home-handle">@{site.githubUsername} · CS, VIT Vellore · Chennai</p>
+          <div class="home-intro">
+            <p>I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans <span class="kw">robotics</span>, <span class="kw">machine learning</span>, and <span class="kw">embedded systems</span>.</p>
+            <p>Recently, my ML research has focused on the <span class="kw">coding abilities of language models</span>. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about <span class="kw">specification gaming</span> and <span class="kw">mechanistic interpretability</span>, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>
+            <p>Feel free to contact me regarding my work and collaborations.</p>
           </div>
-        </details>
+        </div>
+
+        <div class="pills">
+          <a class="pill" href={site.links.github} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#3CC79A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-4-2-6-2.5M15 21v-3.5a3 3 0 0 0-.9-2.3c3-.3 6-1.5 6-6.5a5 5 0 0 0-1.4-3.5 4.6 4.6 0 0 0-.1-3.5s-1.1-.3-3.6 1.4a12.4 12.4 0 0 0-6.4 0C6.1 1.4 5 1.7 5 1.7a4.6 4.6 0 0 0-.1 3.5A5 5 0 0 0 3.5 8.7c0 5 3 6.2 6 6.5a3 3 0 0 0-.9 2.3V21"/></svg>GitHub</a>
+          <a class="pill" href={site.links.linkedin} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#8EA2E6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a>
+          <a class="pill" href={site.links.twitter} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#F3EEE2" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg>X</a>
+          <a class="pill" href={`mailto:${site.links.email}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#EA5A3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Email</a>
+          <a class="pill" href="/resume"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#F2C14E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>CV</a>
+        </div>
+
+        <div class="goes">
+          <a class="go" href="/research"><span>Research</span><span aria-hidden="true">→</span></a>
+          <a class="go" href="/experience"><span>Experience</span><span aria-hidden="true">→</span></a>
+        </div>
       </div>
-      <figure class="portrait"><img src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high"/></figure>
-    </section>
-    <section class="editorial-section home-blogs">
-      <div class="section-heading"><div><h2>Blogs</h2></div><a href="/blog">All posts ↗</a></div>
-      {posts.map(post => <a class="notebook-row" href={`/blog/${post.id}`}><div><h3>{post.data.title}</h3><p class="section-description">{post.data.description}</p></div><span>↗</span></a>)}
+    </div>
+
+    <section class="highlights" aria-labelledby="highlights">
+      <div class="highlights-head">
+        <h2 id="highlights" class="orbit-label">HIGHLIGHTED</h2>
+        <a href="/projects">all projects →</a>
+      </div>
+      <div class="hl-grid">
+        {highlights.map((h) => (
+          <a class="hl" href={h.link} target="_blank" rel="noopener noreferrer">
+            <span class="hl-top"><span class="hl-name">{h.name}</span>{h.working && <span class="live">● in progress</span>}</span>
+            <span class="hl-desc">{h.description}</span>
+          </a>
+        ))}
+      </div>
     </section>
   </div>
 </BaseLayout>

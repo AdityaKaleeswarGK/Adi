@@ -1,7 +1,14 @@
 @import "tailwindcss";
-/* self-hosted variable fonts (no Google Fonts round-trip) */
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/jetbrains-mono";
+/* self-hosted fonts (no Google Fonts round-trip) */
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+@import "@fontsource/noto-sans-tamil/500.css";
+@import "@fontsource/noto-sans-tamil/700.css";
 
 /* ───────────────────────────────────────────────────────────────────────────
    DARK THEME TOKENS
@@ -9,22 +16,28 @@
    Everything on the site reads from these.
    ─────────────────────────────────────────────────────────────────────────── */
 @theme {
-  --color-bg: #101218;
-  --color-surface: #191d27;
-  --color-surface-2: #232938;
-  --color-border: #343b4b;
-  --color-fg: #edf0f6;
-  --color-muted: #b0b9ca;
-  --color-faint: #97a3b8;
+  /* Navagraha palette, taken from the jaathagam:
+     Sani (night) for the ground, Guru gold for highlights, Sevvai coral for the name,
+     Budhan emerald for work in progress. */
+  --color-bg: #030409;
+  --color-surface: #0c0f1c;
+  --color-surface-2: #151a33;
+  --color-border: #272d4b;
+  --color-fg: #f3eee2;
+  --color-muted: #c9ccd8;
+  --color-faint: #a9afc7;
 
-  --color-accent: #abc7ff;
-  --color-accent-hover: #d2e1ff;
+  --color-accent: #f2c14e;
+  --color-accent-hover: #ffe2a0;
   --color-accent-soft: color-mix(in oklab, var(--color-accent) 15%, transparent);
-  --color-done: #805d23;        /* "done" project status (yellow) */
-  --color-working: #abc7ff;
+  --color-coral: #ea5a3d;
+  --color-done: #805d23;
+  --color-working: #3cc79a;
 
-  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-tamil: "Noto Sans Tamil", "IBM Plex Sans", sans-serif;
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────────── */

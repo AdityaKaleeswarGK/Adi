@@ -1,7 +1,7 @@
 ---
 role: "Machine Learning Research Intern"
-org: "University of Texas Rio Grande Valley, AIM Lab"
-location: "Remote"
+org: "University of Texas Rio Grande Valley, AIM Lab · PIs Prof. Jinwoo An, Prof. Yuvaraj Natarajan"
+location: "Remote (Vellore)"
 start: "Jan 2026"
 end: "Jul 2026"
 order: 2
@@ -9,8 +9,7 @@ links:
   - { label: "ECC overview", url: "https://adi-kaleez.vercel.app/projects/ecc" }
   - { label: "PINN research blog", url: "https://adi-kaleez.vercel.app/blog/pinn" }
 ---
-- Worked under Prof. Jinwoo An, collaborating with civil and chemical engineering researchers on materials prediction and crack assessment.
-- ECC prediction: developed CatBoost models to predict the tensile strength and ductility of engineered cementitious composites from their mix design. Grouped 620 tests into 276 unique mixes to prevent leakage between repeated tests of the same composition.
-- Uncertainty and inverse design: calibrated prediction intervals and connected the models to NSGA-II optimization for cost-efficient mix design, with constraints to keep recommendations within the supported data domain. Nominal 80% intervals achieved 80.4% stress and 82.6% strain coverage.
-- Crack measurement: built a replaceable vision front end that segments cracks, measures their paths, and uses MobileSAM to estimate member boundaries. Calibrated image measurements provide geometry for the physics backend, alongside supplied load and material properties.
-- Physics-informed fracture modeling: developed a mesh-free PINN with an embedded Williams crack-tip field to estimate Mode I stress intensity. Evaluated the mechanics solver separately from the vision pipeline, obtaining approximately 6.5% error against an independent finite-element reference in the five-seed reference experiment.
+- Developed an uncertainty-aware framework that predicts the tensile strength and ductility of engineered cementitious composites from their mix design, using CatBoost quantile regression with regime-aware conformal calibration — stress-interval coverage rose from 34.8% to 80.4%, and reached 82.6% for strain, against a nominal 80% target.
+- Extended it into an NSGA-II inverse-design tool that recommends low-cost, low-carbon mixes for target stress and strain, restricted to the region supported by tested mixes, and ranks Pareto solutions by target error and uncertainty to prioritize lab testing.
+- Led the vision pipeline that judges how critical a concrete crack is from a camera image, extracting crack length, orientation and member width through a modular design that accepts any pretrained crack detector or depth source, and deployed it as a live-camera prototype.
+- Co-developed the Williams-enriched PINN that computes the Mode I stress intensity factor by energy minimization, within 0.68% of finite-element references across nine crack geometries at about 6 ms per query on a T4 GPU.

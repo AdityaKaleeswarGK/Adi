@@ -9,7 +9,7 @@ export const site = {
   // Shown in the browser tab + footer.
   title: "Aditya Kaleeswar",
   // One-liner under your name on the homepage hero.
-  tagline: "Research in robotics, classical machine learning, embedded systems, and LLM evaluation.",
+  tagline: "Research across robotics, machine learning, embedded systems, and the evaluation of coding models.",
   // A slightly longer intro used on the homepage / about.
   intro:
     "I’m Aditya. I explore robotics, classical machine learning, embedded systems, and LLM evaluation. Open to research collaborations.",
@@ -27,7 +27,7 @@ export const site = {
   // Social / contact links. Remove any you don't want; they render as footer links.
   links: {
     github: "https://github.com/AdityaKaleeswarGK",
-    email: "adityakaleeswargk04@gmail.com",
+    email: "kaleeswar.aditya.gk@gmail.com",
     twitter: "https://x.com/AdityaKaleeswar",
     linkedin: "https://www.linkedin.com/in/aditya-kaleeswar-gk",
   },
@@ -40,5 +40,5 @@ export const nav = [
   { label: "Experience", href: "/experience" },
   { label: "Research", href: "/research" },
   { label: "Blogs", href: "/blog" },
-  { label: "Resume", href: "/resume" },
+  { label: "Résumé", href: "/resume" },
 ] as const;

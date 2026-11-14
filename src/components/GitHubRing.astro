@@ -1,0 +1,74 @@
+---
+// A year of GitHub contributions drawn as one orbit: weeks run clockwise from the top,
+// weekdays step outward (Sunday innermost). Rendered at build time as plain SVG.
+import { site } from "../site.config";
+
+type Day = { date: string; count: number; level: number };
+let days: Day[] = [];
+try {
+  const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${site.githubUsername}?y=last`);
+  if (res.ok) days = (await res.json()).contributions ?? [];
+} catch {
+  days = [];
+}
+
+const size = 300;
+const cx = size / 2, cy = size / 2;
+const r0 = size * 0.19, step = size * 0.029;
+const labelR = r0 + 7 * step + 14;
+const levels = ["#1f2638", "#1e5c4a", "#2b8c6c", "#3cc79a", "#9af0cf"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// the last 53 Sunday-first weeks, ending today
+const byDate = new Map(days.map((d) => [d.date, d]));
+const today = new Date();
+today.setUTCHours(0, 0, 0, 0);
+const start = new Date(today);
+start.setUTCDate(start.getUTCDate() - 52 * 7 - today.getUTCDay());
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const dots: { x: number; y: number; r: number; fill: string; glow: boolean; title: string }[] = [];
+const labels: { x: number; y: number; text: string }[] = [];
+for (let wk = 0; wk < 53; wk++) {
+  const ang = -Math.PI / 2 + ((wk + 0.5) / 53) * Math.PI * 2;
+  let monthStart: Date | null = null;
+  for (let d = 0; d < 7; d++) {
+    const day = new Date(start);
+    day.setUTCDate(start.getUTCDate() + wk * 7 + d);
+    if (day.getUTCDate() === 1) monthStart = day;
+    if (day > today) continue;
+    const rec = byDate.get(iso(day));
+    const level = Math.min(4, rec?.level ?? 0);
+    const rr = r0 + (d + 0.5) * step;
+    dots.push({
+      x: +(cx + rr * Math.cos(ang)).toFixed(2),
+      y: +(cy + rr * Math.sin(ang)).toFixed(2),
+      r: +(step * 0.36).toFixed(2),
+      fill: levels[level],
+      glow: level >= 3,
+      title: `${rec?.count ?? 0} contributions on ${iso(day)}`,
+    });
+  }
+  // one label where each month begins; the month just starting at the top belongs to today
+  if (monthStart && !(monthStart.getUTCMonth() === today.getUTCMonth() && wk < 4)) {
+    labels.push({ x: +(cx + labelR * Math.cos(ang)).toFixed(1), y: +(cy + labelR * Math.sin(ang)).toFixed(1), text: MONTHS[monthStart.getUTCMonth()] });
+  }
+}
+const total = days.reduce((s, d) => s + (d.count || 0), 0);
+const label = days.length
+  ? `${total} GitHub contributions in the past year, drawn as a circular calendar`
+  : "GitHub contribution calendar (data unavailable at build time)";
+---
+
+<section class="glass gh-card" aria-labelledby="gh-label">
+  <div class="gh-head">
+    <span id="gh-label">GITHUB</span>
+    <a href={`https://github.com/${site.githubUsername}`} target="_blank" rel="noopener noreferrer">@{site.githubUsername}</a>
+  </div>
+  <svg class="gh-ring" viewBox={`0 0 ${size} ${size}`} role="img" aria-label={label}>
+    {dots.filter((d) => d.glow).map((d) => <circle cx={d.x} cy={d.y} r={step * 0.75} fill={d.fill} opacity="0.35" />)}
+    {dots.map((d) => <circle cx={d.x} cy={d.y} r={d.r} fill={d.fill}><title>{d.title}</title></circle>)}
+    <circle cx={cx} cy={cy} r={r0 - 8} fill="none" stroke="rgba(242,193,78,0.35)" />
+    {labels.map((l) => <text x={l.x} y={l.y} font-size="11" text-anchor="middle" dominant-baseline="middle">{l.text}</text>)}
+  </svg>
+</section>

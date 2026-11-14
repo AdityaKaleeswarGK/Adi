@@ -3,33 +3,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Experience from "../../components/Experience.astro";
 ---
 <BaseLayout title="Experience" description="Research, engineering, and education — Aditya Kaleeswar.">
-  <div class="container-wide experience-page">
-    <header class="experience-intro"><h1>Experience</h1></header>
-    <div class="experience-layout">
-      <aside class="experience-index"><nav aria-label="On this page"><p class="eyebrow">On this page</p><a href="#research"><span>01</span> Roles</a><a href="#education"><span>02</span> Education</a></nav></aside>
-      <div class="experience-main">
+  <div class="orbit-page">
+    <h1 class="orbit-title serif" style="margin-bottom: 26px;">Experience</h1>
+    <div class="xp-layout">
+      <nav class="xp-toc" aria-label="On this page">
+        <p class="orbit-label" style="font-size: 11px; letter-spacing: 2px; margin-bottom: 6px;">ON THIS PAGE</p>
+        <a href="#roles"><span>01</span> Roles</a>
+        <a href="#education"><span>02</span> Education</a>
+      </nav>
+      <div class="xp-main">
         <Experience />
-        <section id="education" class="experience-extra"><p class="eyebrow">02 / Education</p><div class="education-row"><div><h2>VIT Vellore</h2><p>B.Tech. in Computer Science and Engineering</p></div><span>Sep 2022 – Jul 2026</span></div></section>
+        <section id="education" class="glass-light xp-edu" aria-labelledby="edu-h">
+          <div>
+            <p class="label">02 / EDUCATION</p>
+            <h2 id="edu-h">Vellore Institute of Technology</h2>
+            <p>B.Tech. in Computer Science and Engineering</p>
+          </div>
+          <span>Sep 2022 – Apr 2026</span>
+        </section>
       </div>
     </div>
   </div>
 </BaseLayout>
-
-<style is:inline>
-  body:has(.experience-page) #main { padding-top:24px; }
-  .experience-page { max-width:1180px; }
-  .experience-intro { margin:0 0 18px; }
-  .experience-intro h1 { font:400 clamp(36px,4vw,46px)/1.2 Georgia,serif; letter-spacing:-1px; margin:0; }
-  .experience-layout { display:grid; grid-template-columns:205px minmax(0,1fr); gap:55px; align-items:start; }
-  .experience-index { position:sticky; top:35px; padding-top:12px; }
-  .experience-index nav a { display:flex; gap:12px; padding:12px 0; color:var(--color-muted); font-size:11px; line-height:1.7; }
-  .experience-index nav a span { font:10px/1.8 var(--font-mono); color:var(--color-faint); }
-  .experience-index nav a:hover { color:var(--color-accent); }
-  .experience-main { min-width:0; }
-  .experience-extra { padding:30px 0 40px; border-top:1px solid var(--color-border); scroll-margin-top:25px; }
-  .education-row { display:flex; justify-content:space-between; gap:25px; margin-top:25px; }
-  .education-row h2 { font:28px/1.3 Georgia,serif; }.education-row p { margin-top:10px; font-size:13px; line-height:1.8; color:var(--color-muted); }
-  .education-row>span { font:11px/2 var(--font-mono); color:var(--color-muted); text-align:right; }
-  @media(max-width:950px) { .experience-layout { grid-template-columns:1fr; gap:18px; }.experience-index { position:static; padding:0; }.experience-index nav { display:flex; flex-wrap:wrap; gap:8px 20px; }.experience-index nav p { display:none; } }
-  @media(max-width:600px) { .experience-index nav a { padding:5px 0; }.education-row { flex-direction:column; gap:16px; }.education-row>span { text-align:left; } }
-</style>
