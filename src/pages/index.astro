@@ -3,6 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import GitHubRing from "../components/GitHubRing.astro";
 import { site } from "../site.config";
 import { highlights } from "../data/projects";
+import { papers } from "../data/papers";
+import { patents } from "../data/patents";
 ---
 <BaseLayout hideFooter>
   <div class="orbit-page">
@@ -19,8 +21,8 @@ import { highlights } from "../data/projects";
         </div>
         <div>
           <div class="home-intro">
-            <p>I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans <span class="kw">robotics</span>, <span class="kw">machine learning</span>, and <span class="kw">embedded systems</span>.</p>
-            <p>Recently, my ML research has focused on the <span class="kw">coding abilities of language models</span>. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about <span class="kw">specification gaming</span> and <span class="kw">mechanistic interpretability</span>, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>
+            <p>I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans robotics, machine learning, and embedded systems.</p>
+            <p>Recently, my ML research has focused on the coding abilities of language models. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about specification gaming and mechanistic interpretability, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>
             <p>Feel free to contact me regarding my work and collaborations.</p>
           </div>
         </div>
@@ -34,7 +36,7 @@ import { highlights } from "../data/projects";
         </div>
 
         <div class="goes">
-          <a class="go" href="/research"><span>Research</span><span aria-hidden="true">→</span></a>
+          <a class="go" href="#research"><span>Research</span><span aria-hidden="true">→</span></a>
           <a class="go" href="/experience"><span>Experience</span><span aria-hidden="true">→</span></a>
         </div>
       </div>
@@ -51,6 +53,34 @@ import { highlights } from "../data/projects";
             <span class="hl-top"><span class="hl-name">{h.name}</span>{h.working && <span class="live">● in progress</span>}</span>
             <span class="hl-desc">{h.description}</span>
           </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="research" class="home-research" aria-labelledby="research-h">
+      <h2 id="research-h" class="orbit-label">RESEARCH</h2>
+      <div class="glass-light r-section">
+        <h3 class="r-sub">PAPERS</h3>
+        {papers.map((p, i) => (
+          <div class="r-row">
+            <span class="r-num">[{i + 1}]</span>
+            <div class="r-body">
+              <p class="r-title">{p.title}</p>
+              <p class="r-meta">
+                {p.authors.map((a, j) => <>{j > 0 && ", "}{a === "A. Kaleeswar" ? <b>{a}</b> : a}</>)}
+                {" · "}<span class="r-status">{p.status}</span>
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="glass-light r-section">
+        <h3 class="r-sub">PATENT APPLICATIONS</h3>
+        {patents.map((p) => (
+          <div class="r-row">
+            <span class="r-app">{p.number}</span>
+            <p class="r-body r-title" style="font-size:17px;">{p.title}</p>
+          </div>
         ))}
       </div>
     </section>

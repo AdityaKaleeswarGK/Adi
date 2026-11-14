@@ -125,7 +125,7 @@ class Sky {
     var w = this.w, h = this.h;
     // phones: a smaller chakra centred on the page's anchor (the round photo on the home page),
     // so on landing it sits around you; it stays fixed there as the content scrolls over it
-    if (w < 700) {
+    if (w <= 960) {
       var Rm = Math.min(w * 0.40, h * 0.24);
       var anchor = document.getElementById('sky-anchor');
       if (anchor) {

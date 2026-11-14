@@ -69,6 +69,12 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
       import { startSky } from "../scripts/sky.js";
       const canvas = document.getElementById("sky");
       if (canvas instanceof HTMLCanvasElement) startSky(canvas);
+      // links like /#research land on the section, also when arriving from another page
+      document.addEventListener("astro:page-load", () => {
+        if (!location.hash) return;
+        const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        if (target) setTimeout(() => target.scrollIntoView({ block: "start", behavior: "instant" }), 0);
+      });
     </script>
   </body>
 </html>
