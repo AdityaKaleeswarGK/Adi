@@ -215,9 +215,20 @@ class Sky {
     this.extendTrail(Math.floor(this.jd - BIRTH_JD));
     // spin in fast, slowing to rest exactly as the sky reaches today
     this.spin = Math.PI * 5 * Math.pow(1 - ease(t), 2);
+    // on a page change the chakra gives a small turn and the stars drift past a little faster,
+    // then everything eases back to rest (the chart's orientation ends exactly where it was)
+    var pulse = 0;
+    if (this.pulseT != null) {
+      this.pulseT += dt;
+      var pt = Math.min(1, this.pulseT / 0.8);
+      pulse = Math.sin(Math.PI * pt);
+      pulse *= pulse;
+      if (pt >= 1) this.pulseT = null;
+    }
+    this.spin += 0.18 * pulse;
     // after it lands: planets brighten, rings step back
     this.settle = smooth((this.elapsed - this.journeySec) / this.settleSec);
-    var speed = 0.02;
+    var speed = 0.02 + 0.16 * pulse;
     this.wheelAlpha = 1;
     var self = this;
     this.stars.forEach(function (s) {
@@ -349,6 +360,7 @@ export function startSky(canvas) {
   sky.init();
   window.__sky = sky;
   var place = function () { if (sky.w) sky.cur = sky.layoutFor(sky.page); };
+  document.addEventListener('astro:before-preparation', function () { if (!sky.reduced) sky.pulseT = 0; });
   document.addEventListener('astro:page-load', place);
   window.addEventListener('load', place);
   return sky;

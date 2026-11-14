@@ -229,3 +229,10 @@ html[data-sky="off"] #sky { display: none; }
 .home-research { margin-top: 56px; scroll-margin-top: 96px; }
 .home-research .r-section { margin: 14px 0 16px; }
 @media (max-width: 960px) { .orbit-nav .side.end { display: none; } }
+
+/* ─── page change ────────────────────────────────────────────────────────── */
+@keyframes orbit-out { to { opacity: 0; transform: translateY(-10px); filter: blur(4px); } }
+@keyframes orbit-in { from { opacity: 0; transform: translateY(16px); filter: blur(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
