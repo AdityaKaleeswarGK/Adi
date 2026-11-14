@@ -81,12 +81,36 @@ const pageTurn = {
       import { startSky } from "../scripts/sky.js";
       const canvas = document.getElementById("sky");
       if (canvas instanceof HTMLCanvasElement) startSky(canvas);
-      // links like /#research land on the section, also when arriving from another page
-      document.addEventListener("astro:page-load", () => {
-        if (!location.hash) return;
-        const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-        if (target) setTimeout(() => target.scrollIntoView({ block: "start", behavior: "instant" }), 0);
-      });
+      // Sections like /#research.
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const hashTarget = () => (location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null);
+      const jumpToHash = () => hashTarget()?.scrollIntoView({ block: "start", behavior: "instant" });
+
+      // Arriving from another page: be at the section before the new page fades in,
+      // instead of fading in at the top and then scrolling down.
+      document.addEventListener("astro:after-swap", jumpToHash);
+      // A direct visit or the /research redirect lands there too.
+      jumpToHash();
+
+      // Already on the page: glide to the section (or back to the top) without a page change.
+      document.addEventListener(
+        "click",
+        (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          const link = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+          if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+          const url = new URL(link.href, location.href);
+          if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search) return;
+          const target = url.hash ? document.getElementById(decodeURIComponent(url.hash.slice(1))) : null;
+          if (url.hash && !target) return;
+          e.preventDefault();
+          const behavior = reduced ? "instant" : "smooth";
+          if (target) target.scrollIntoView({ block: "start", behavior });
+          else window.scrollTo({ top: 0, behavior });
+          if (url.hash !== location.hash) history.pushState(history.state, "", url.pathname + url.search + url.hash);
+        },
+        true,
+      );
     </script>
   </body>
 </html>
