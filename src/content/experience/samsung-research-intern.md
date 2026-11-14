@@ -4,7 +4,7 @@ org: "Samsung Research Bangalore · PI Prof. Shanthi H"
 location: "Remote"
 start: "Oct 2024"
 end: "Jun 2025"
-order: 4
+order: 3
 links:
   - { label: "NL → Data Viz repo", url: "https://github.com/AdityaKaleeswarGK/Natural_Language_to_data_visualization" }
 ---

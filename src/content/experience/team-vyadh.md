@@ -4,7 +4,7 @@ org: "Team Vyadh, VIT Mars Rover Team"
 location: "Vellore"
 start: "Apr 2024"
 end: "Sep 2025"
-order: 5
+order: 4
 links:
   - { label: "Obstacle & pit avoidance repo", url: "https://github.com/AdityaKaleeswarGK/obstacle_pit_avoidance_using-pointcloud-process" }
   - { label: "Rover stack repo", url: "https://github.com/TeamVyadhVIT/strawberry_cheesecake" }

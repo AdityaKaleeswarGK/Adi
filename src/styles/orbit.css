@@ -9,7 +9,7 @@ html[data-sky="on"], html[data-sky="on"] body { background: var(--color-bg); }
 html[data-sky="off"] #sky { display: none; }
 
 /* ─── header ─────────────────────────────────────────────────────────────── */
-.orbit-header { position: relative; z-index: 3; }
+.orbit-header { position: sticky; top: 0; z-index: 30; background: linear-gradient(rgba(3,4,9,.92), rgba(3,4,9,.72)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
 .orbit-nav { max-width: 1180px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px; }
 .orbit-nav .side { flex: 1 1 0; min-width: 110px; display: flex; }
 .orbit-nav .side.end { justify-content: flex-end; }
@@ -33,7 +33,7 @@ html[data-sky="off"] #sky { display: none; }
 .orbit-page { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 40px 32px 96px; }
 .orbit-page.narrow { max-width: 900px; }
 .glass { border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(10,12,22,.62); backdrop-filter: blur(6px); }
-.glass-light { border: 1px solid rgba(255,255,255,.07); border-radius: 14px; background: rgba(10,12,22,.28); backdrop-filter: blur(3px); }
+.glass-light { border: 1px solid rgba(255,255,255,.10); border-radius: 16px; background: rgba(255,255,255,.035); backdrop-filter: blur(8px); }
 .orbit-title { margin: 0 0 8px; font-weight: 600; font-size: clamp(40px, 6vw, 56px); letter-spacing: -1.4px; line-height: 1.08; }
 .orbit-title.serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -.5px; }
 .orbit-lede { margin: 0 0 32px; max-width: 680px; font-size: 18px; line-height: 1.6; color: var(--color-muted); }
@@ -176,7 +176,7 @@ html[data-sky="off"] #sky { display: none; }
 }
 
 /* ─── blog list ──────────────────────────────────────────────────────────── */
-.b-list { padding: 4px 26px; }
+.b-list { padding: 4px 26px; border-radius: 16px; border-color: rgba(255,255,255,.10); background: rgba(255,255,255,.035); backdrop-filter: blur(8px); }
 .b-row { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 8px 24px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,.07); color: var(--color-fg); }
 .b-row:last-child { border-bottom: 0; }
 .b-date { font: 12px var(--font-mono); color: var(--color-accent); }

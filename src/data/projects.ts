@@ -24,7 +24,7 @@ export const projects: Project[] = [
   { title: "aasannai", repo: "AdityaKaleeswarGK/aasannai", link: "https://github.com/AdityaKaleeswarGK/aasannai", working: false, featured: false, tags: ["language models"], description: "An MCP server on Cloudflare Workers that keeps a personal vocabulary — words, meanings and example sentences — for LLM assistants to read and add to." },
   { title: "meeting_summary", repo: "AdityaKaleeswarGK/meeting_summary", link: "https://github.com/AdityaKaleeswarGK/meeting_summary", working: false, featured: false, tags: ["language models"], description: "A transformer encoder–decoder written from scratch in PyTorch and trained to summarize meeting transcripts." },
   { title: "websocket", repo: "AdityaKaleeswarGK/websocket", link: "https://github.com/AdityaKaleeswarGK/websocket", working: false, featured: false, tags: ["networking"], description: "A Python WebSocket server with two clients, for real-time messaging between them." },
-  { title: "WebRTC", repo: "AdityaKaleeswarGK/WebRTC", link: "https://github.com/AdityaKaleeswarGK/WebRTC", working: false, featured: false, tags: ["networking"], description: "[One-line description of the WebRTC project]" },
+  { title: "WebRTC", repo: "AdityaKaleeswarGK/WebRTC", link: "https://github.com/AdityaKaleeswarGK/WebRTC", working: false, featured: false, tags: ["networking"], description: "" },
 ];
 
 // The four cards under the home page introduction.

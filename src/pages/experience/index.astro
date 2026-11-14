@@ -3,25 +3,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Experience from "../../components/Experience.astro";
 ---
 <BaseLayout title="Experience" description="Research, engineering, and education — Aditya Kaleeswar.">
-  <div class="orbit-page">
+  <div class="orbit-page" style="max-width: 1000px;">
     <h1 class="orbit-title serif" style="margin-bottom: 26px;">Experience</h1>
-    <div class="xp-layout">
-      <nav class="xp-toc" aria-label="On this page">
-        <p class="orbit-label" style="font-size: 11px; letter-spacing: 2px; margin-bottom: 6px;">ON THIS PAGE</p>
-        <a href="#roles"><span>01</span> Roles</a>
-        <a href="#education"><span>02</span> Education</a>
-      </nav>
-      <div class="xp-main">
-        <Experience />
-        <section id="education" class="glass-light xp-edu" aria-labelledby="edu-h">
-          <div>
-            <p class="label">02 / EDUCATION</p>
-            <h2 id="edu-h">Vellore Institute of Technology</h2>
-            <p>B.Tech. in Computer Science and Engineering</p>
-          </div>
-          <span>Sep 2022 – Apr 2026</span>
-        </section>
+    <Experience />
+    <section id="education" class="glass-light xp-edu" aria-labelledby="edu-h">
+      <div>
+        <p class="label">EDUCATION</p>
+        <h2 id="edu-h">Vellore Institute of Technology</h2>
+        <p>B.Tech. in Computer Science and Engineering</p>
       </div>
-    </div>
+      <span>Sep 2022 – Apr 2026</span>
+    </section>
   </div>
 </BaseLayout>

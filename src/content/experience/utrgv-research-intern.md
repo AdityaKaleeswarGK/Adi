@@ -4,7 +4,7 @@ org: "University of Texas Rio Grande Valley, AIM Lab · PIs Prof. Jinwoo An, Pro
 location: "Remote (Vellore)"
 start: "Jan 2026"
 end: "Jul 2026"
-order: 2
+order: 1
 links:
   - { label: "ECC overview", url: "https://adi-kaleez.vercel.app/projects/ecc" }
   - { label: "PINN research blog", url: "https://adi-kaleez.vercel.app/blog/pinn" }
