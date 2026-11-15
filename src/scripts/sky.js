@@ -274,9 +274,18 @@ class Sky {
     var nowJd = jdNow(), t = Math.min(1, this.elapsed / this.journeySec);
     this.live = t >= 1;
     var e = ease(t), w = 1 - e;
-    this.jd = this.live ? nowJd : BIRTH_JD + e * (nowJd - BIRTH_JD);
+    // Keep every graha on the same astronomical clock. Show a few days at
+    // either end of the journey; skip the intervening years while the moving
+    // markers are invisible. The engraved trails still record the full span.
+    const windowDays = Math.min(6, (nowJd - BIRTH_JD) / 2);
+    const natal = t < 0.5;
+    this.jd = natal
+      ? BIRTH_JD + windowDays * smooth(2 * t)
+      : nowJd - windowDays * (1 - smooth(2 * t - 1));
+    this.markerAlpha = natal ? 1 - smooth((t - 0.36) / 0.12) : smooth((t - 0.52) / 0.12);
     this.sky = skyAt(this.jd);
-    this.extendTrail(Math.floor(this.jd - BIRTH_JD));
+    this.extendTrail(Math.floor(e * (nowJd - BIRTH_JD)));
+    if (this.markerAlpha === 0) this.links = {};
     this.updateLinks(dt);
     // a page change: the camera lifts toward face-on and drops back while the gimbal rings
     // each go once round their own axis, coming to rest exactly where they were
@@ -298,16 +307,19 @@ class Sky {
     // the visit opens on the chart as the jaathagam draws it: flat, face-on, at the moment of
     // birth. As the grahas travel to today it turns once and leans back into an instrument,
     // and the rings tumble in from wherever they were and lock.
-    var tilt = rad((this.pose() + Math.min(14, this.scroll * 0.02)) * e - 5 * this.py - 12 * pulse);
+    // Spread the camera tilt over the page; short pages keep their gentler travel.
+    const scrollRange = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollTilt = 14 * clamp01(this.scroll / Math.max(700, scrollRange));
+    var tilt = rad((this.pose() + scrollTilt) * e - 6 * this.py - 12 * pulse);
     var yaw = rad(8 * this.px + 3.5 * Math.sin(this.time * 0.13) * e);
     var roll = rad(-11 * e + 1.2 * Math.sin(this.time * 0.09) * e);
     this.M = mul(rotZ(roll), mul(rotY(yaw), mul(rotX(tilt), rotZ(Math.PI * 1.5 * w * w))));
     var wind = Math.pow(w, 1.5), prec = this.time * 0.09;
     // nakshatra ring, rasi ring, and the meridian ring that swings about the lagna axis:
     // at rest each sits a few degrees off the chart, and that lean slowly precesses
-    this.MA = mul(this.M, mul(rotAxis(prec, rad(9) * e), rotAxis(rad(20), TAU * (1.1 * wind + turn))));
-    this.MB = mul(this.M, mul(rotAxis(prec + 2.1, rad(-12) * e), rotAxis(rad(110), -TAU * (0.8 * wind + turn))));
-    this.MC = mul(this.M, rotX(rad(64) + rad(7) * Math.sin(prec * 1.7) + TAU * (0.6 * wind + turn)));
+    this.MA = mul(this.M, mul(rotAxis(prec, rad(11) * e), rotAxis(rad(20), TAU * (1.1 * wind + turn))));
+    this.MB = mul(this.M, mul(rotAxis(prec + 2.1, rad(-14) * e), rotAxis(rad(110), -TAU * (0.8 * wind + turn))));
+    this.MC = mul(this.M, rotX(rad(64) + rad(8.5) * Math.sin(prec * 2.1) + TAU * (0.6 * wind + turn)));
     // after it lands: planets brighten, rings step back
     this.settle = smooth((this.elapsed - this.journeySec) / this.settleSec);
     this.wheelAlpha = smooth(this.elapsed / 0.9);
@@ -477,7 +489,7 @@ class Sky {
     // running along it in the direction of the gaze
     var k;
     for (k in this.links) {
-      var ends = k.split('>'), A = at[ends[0]], B = at[ends[1]], la = this.links[k] * wa * (0.3 + 0.7 * st);
+      var ends = k.split('>'), A = at[ends[0]], B = at[ends[1]], la = this.markerAlpha * this.links[k] * wa * (0.3 + 0.7 * st);
       if (la < 0.01) continue;
       var grad = ctx.createLinearGradient(A.p[0], A.p[1], B.p[0], B.p[1]);
       grad.addColorStop(0, A.g.color); grad.addColorStop(1, B.g.color);
@@ -493,7 +505,7 @@ class Sky {
     order.sort(function (a, b) { return a.p[2] - b.p[2]; });
     order.forEach(function (o) {
       var g = o.g, p = o.p, nr = self.near(p[2]);
-      var dim = (g.key === 'Moon' && !self.live) ? 0.4 : 1;
+      var dim = self.markerAlpha * ((g.key === 'Moon' && !self.live) ? 0.4 : 1);
       var size = (g.key === 'Sun' ? 5.5 : g.key === 'Jupiter' || g.key === 'Saturn' ? 4 : 3.2) * (1 + 0.45 * st) * (0.8 + 0.3 * o.fr) * (0.72 + 0.56 * nr) * (R > 240 ? 1 : 0.85);
       var glow = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], size * (6 + 4 * st));
       glow.addColorStop(0, g.color); glow.addColorStop(1, 'rgba(0,0,0,0)');
