@@ -3,7 +3,7 @@
 // disc held in three gimbal rings (nakshatra, rasi, and a meridian ring on the lagna axis),
 // seen leaning back in 3-D. A fresh visit opens on the flat chart at the moment of birth; as
 // the grahas travel by their real orbits to today, it leans back and the rings tumble in and
-// lock. Threads between grahas are the drishti graph of the sky as it stands.
+// lock.
 // Planet positions: JPL approximate orbital elements (Standish), geocentric, Lahiri sidereal.
 // The canvas is persisted across view-transition navigations, so this runs once per visit.
 
@@ -84,9 +84,6 @@ function rotZ(a) { var c = Math.cos(a), s = Math.sin(a); return [c, -s, 0, s, c,
 // a turn by `a` about a diameter of the chart lying at in-plane angle `phi`
 function rotAxis(phi, a) { return mul(rotZ(phi), mul(rotX(a), rotZ(-phi))); }
 
-// graha drishti: every graha looks at the 7th house from its own; Mars, Jupiter and Saturn
-// have two more each. Rahu and Ketu are looked at but do not look.
-var DRISHTI = { Sun: [7], Moon: [7], Mercury: [7], Venus: [7], Mars: [4, 7, 8], Jupiter: [5, 7, 9], Saturn: [3, 7, 10] };
 var TAU = Math.PI * 2;
 const PAGE_TURN_MS = 1360;
 
@@ -101,7 +98,6 @@ class Sky {
     this.settleSec = 1.8;
     this.tries = 0;
     this.flashes = [];
-    this.links = {};
     this.tx = 0; this.ty = 0; this.px = 0; this.py = 0;
     this.setup();
   }
@@ -237,27 +233,6 @@ class Sky {
     this.trailDay = toDay;
   }
 
-  // which graha looks at which, in the sky as it stands; each link fades in and out on its own
-  updateLinks(dt) {
-    var sky = this.sky, want = {}, self = this;
-    var rasi = function (k) { return Math.floor(sky[k][0] / 30); };
-    GRAHAS.forEach(function (a) {
-      var looks = DRISHTI[a.key];
-      if (!looks || (a.key === 'Moon' && !self.live)) return;
-      GRAHAS.forEach(function (b) {
-        if (a === b || (b.key === 'Moon' && !self.live)) return;
-        var house = ((rasi(b.key) - rasi(a.key) + 12) % 12) + 1;
-        if (looks.indexOf(house) >= 0) want[a.key + '>' + b.key] = 1;
-      });
-    });
-    var k, rate = dt > 0 ? Math.min(1, dt * 3) : 1;
-    for (k in want) if (!(k in this.links)) this.links[k] = 0;
-    for (k in this.links) {
-      this.links[k] += ((want[k] ? 1 : 0) - this.links[k]) * rate;
-      if (!want[k] && this.links[k] < 0.01) delete this.links[k];
-    }
-  }
-
   tick(dt) {
     // the page can start with a zero-size viewport (a hidden tab); size the sky once it has one
     if (!this.stars) { this.resize(); if (!this.stars) return; }
@@ -281,8 +256,6 @@ class Sky {
     this.markerAlpha = natal ? 1 - smooth((t - 0.36) / 0.12) : smooth((t - 0.52) / 0.12);
     this.sky = skyAt(this.jd);
     this.extendTrail(Math.floor(e * (nowJd - BIRTH_JD)));
-    if (this.markerAlpha === 0) this.links = {};
-    this.updateLinks(dt);
     // a page change: the camera lifts toward face-on and drops back while the gimbal rings
     // each go once round their own axis, coming to rest exactly where they were
     const phase = this.turnStart == null ? 1 : clamp01((performance.now() - this.turnStart) / PAGE_TURN_MS);
@@ -471,22 +444,6 @@ class Sky {
       at[g.key] = { g: g, fr: fr, p: self.proj(M, self.local(s[0], fr, R)) };
       order.push(at[g.key]);
     });
-    // the drishti graph: a thread from each graha to the ones it looks at, with a pulse
-    // running along it in the direction of the gaze
-    var k;
-    for (k in this.links) {
-      var ends = k.split('>'), A = at[ends[0]], B = at[ends[1]], la = this.markerAlpha * this.links[k] * wa * (0.3 + 0.7 * st);
-      if (la < 0.01) continue;
-      var grad = ctx.createLinearGradient(A.p[0], A.p[1], B.p[0], B.p[1]);
-      grad.addColorStop(0, A.g.color); grad.addColorStop(1, B.g.color);
-      ctx.globalAlpha = 0.3 * la; ctx.strokeStyle = grad; ctx.lineWidth = 0.9;
-      ctx.beginPath(); ctx.moveTo(A.p[0], A.p[1]); ctx.lineTo(B.p[0], B.p[1]); ctx.stroke();
-      if (!this.reduced) {
-        var u = (tm * 0.32 + (k.charCodeAt(0) * 7 + k.charCodeAt(k.length - 2) * 13) % 10 / 10) % 1;
-        ctx.globalAlpha = 0.9 * la * Math.sin(Math.PI * u); ctx.fillStyle = A.g.color;
-        ctx.beginPath(); ctx.arc(A.p[0] + (B.p[0] - A.p[0]) * u, A.p[1] + (B.p[1] - A.p[1]) * u, 1.5, 0, 6.2832); ctx.fill();
-      }
-    }
     // the grahas, far ones first; nearer ones are drawn larger
     order.sort(function (a, b) { return a.p[2] - b.p[2]; });
     order.forEach(function (o) {
