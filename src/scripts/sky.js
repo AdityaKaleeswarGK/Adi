@@ -422,11 +422,7 @@ class Sky {
       c.scale(R / self.R0, R / self.R0);
       c.drawImage(self.trail, -self.S / 2, -self.S / 2, self.S, self.S);
     });
-    // The axle through the chart and Earth at the centre.
-    ctx.lineWidth = 1;
-    var ax0 = this.proj(M, [0, 0], -R * 0.2), ax1 = this.proj(M, [0, 0], R * 0.2);
-    ctx.globalAlpha = 0.5 * ringA; ctx.strokeStyle = 'rgb(160,176,232)';
-    ctx.beginPath(); ctx.moveTo(ax0[0], ax0[1]); ctx.lineTo(ax1[0], ax1[1]); ctx.stroke();
+    // Earth at the centre.
     ctx.globalAlpha = wa; ctx.fillStyle = '#BFD3FF'; ctx.beginPath(); ctx.arc(ox, oy, 2.5, 0, 6.2832); ctx.fill();
     // where each graha stood at birth: a small mark lying flat on the chart
     this.onPlane(M, function (c) {
