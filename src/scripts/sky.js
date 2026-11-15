@@ -157,12 +157,12 @@ class Sky {
   // the chakra sits in the centre of every page, as large as fits with its whole rim on screen
   layoutFor(page) {
     var w = this.w, h = this.h;
-    // phones: a smaller chakra centred on the page's anchor (the round photo on the home page),
-    // so on landing it sits around you; it stays fixed there as the content scrolls over it
+    // The compact homepage uses a viewport anchor; tablets still frame the portrait.
     if (w <= 960) {
       var Rm = Math.min(w * 0.40, h * 0.24);
       var anchor = document.getElementById('sky-anchor');
       if (anchor) {
+        if (w <= 700) return { x: w / 2, y: h * 0.40, R: Rm, portrait: true };
         var r = anchor.getBoundingClientRect();
         var y = r.top + (window.scrollY || 0) + r.height / 2;
         if (r.height > 0) return { x: w / 2, y: y, R: Rm, portrait: true };
@@ -505,7 +505,7 @@ class Sky {
     order.sort(function (a, b) { return a.p[2] - b.p[2]; });
     order.forEach(function (o) {
       var g = o.g, p = o.p, nr = self.near(p[2]);
-      var dim = self.markerAlpha * ((g.key === 'Moon' && !self.live) ? 0.4 : 1);
+      var dim = 0.50 * self.markerAlpha * ((g.key === 'Moon' && !self.live) ? 0.4 : 1);
       var size = (g.key === 'Sun' ? 5.5 : g.key === 'Jupiter' || g.key === 'Saturn' ? 4 : 3.2) * (1 + 0.45 * st) * (0.8 + 0.3 * o.fr) * (0.72 + 0.56 * nr) * (R > 240 ? 1 : 0.85);
       var glow = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], size * (6 + 4 * st));
       glow.addColorStop(0, g.color); glow.addColorStop(1, 'rgba(0,0,0,0)');

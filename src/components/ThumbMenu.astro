@@ -5,13 +5,19 @@
 import { nav } from "../site.config";
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
-// nearest the thumb first: the column grows upward from the button
-const items = [...nav].reverse();
+const items = [
+  { label: "Highlights", href: "/#highlights", visibility: "phone-item" },
+  { label: "Experience", href: "/experience", visibility: "" },
+  ...nav.filter(item => item.href === "/#research").map(item => ({ ...item, visibility: "" })),
+  ...nav.filter(item => item.href !== "/#research" && item.href !== "/experience").map(item => ({
+    ...item, visibility: item.href === "/" ? "wide-item" : "",
+  })),
+];
 ---
 <div class="thumb" data-thumb>
   <ul id="thumb-list" class="thumb-list" aria-label="Pages">
     {items.map((item, i) => (
-      <li style={`--i:${items.length - 1 - i}`}>
+      <li class={item.visibility} style={`--i:${items.length - 1 - i}`}>
         <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}</a>
       </li>
     ))}

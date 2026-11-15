@@ -5,9 +5,21 @@ import { site } from "../site.config";
 import { highlights } from "../data/projects";
 import { papers } from "../data/papers";
 import { patents } from "../data/patents";
+import { getCollection } from "astro:content";
+const cards = {
+  "utrgv-research-intern": ["utrgv", "University of Texas Rio Grande Valley · AIM Lab"],
+  "vit-student-researcher": ["knu", "VIT Vellore × Kyungpook National University"],
+  "samsung-research-intern": ["prism", "Samsung Research Bangalore"],
+  "team-vyadh": ["vyadh", "Team Vyadh · VIT Mars Rover Team"],
+};
+const roles = (await getCollection("experience")).sort((a,b) => a.data.order - b.data.order)
+  .flatMap(({id, data}) => {
+    const card = cards[id as keyof typeof cards];
+    return card ? [{card, ...data}] : [];
+  });
 ---
 <BaseLayout hideFooter>
-  <div class="orbit-page">
+  <div class="orbit-page home-page">
     <div class="home-grid">
       <aside class="home-aside" aria-label="Profile">
         <img id="sky-anchor" class="home-photo" src={site.heroImage} alt="Aditya sitting in a café" width="769" height="1022" fetchpriority="high" />
@@ -16,14 +28,16 @@ import { patents } from "../data/patents";
 
       <div class="home-main">
         <div class="home-head">
-          <h1 class="home-hello">Hey, I’m <em>Aditya.</em></h1>
-          <p class="home-handle">@{site.githubUsername} · CS, VIT Vellore · Chennai</p>
+          <h1 class="home-hello"><span class="wide-greeting">Hey, I’m <em>Aditya.</em></span><span class="phone-name">{site.name}</span></h1>
+          <address class="profile-contacts">
+            <a href={`mailto:${site.links.email}`}>{site.links.email}</a>
+            <span class="phone-socials"><a href={site.links.github}>GitHub</a><a href={site.links.linkedin}>LinkedIn</a><a href={site.links.twitter}>X</a></span>
+          </address>
         </div>
         <div>
           <div class="home-intro">
             <p>I’m currently researching independently. I don’t confine my research or work to just one domain. I pick up problems that I find interesting and that could have a considerable impact. My work currently spans robotics, machine learning, and embedded systems.</p>
             <p>Recently, my ML research has focused on the coding abilities of language models. I’ve been working on coding benchmarks, checking whether they measure what they claim to, and developing coding harnesses and other evaluation tools. I’m also learning more about specification gaming and mechanistic interpretability, especially whether interpretability techniques can help design better benchmarks. I’m working on RL in EVs and trying to understand Formula 1.</p>
-            <p>Feel free to contact me regarding my work and collaborations.</p>
           </div>
         </div>
 
@@ -39,12 +53,16 @@ import { patents } from "../data/patents";
           <a class="go" href="#research"><span>Research</span><span aria-hidden="true">→</span></a>
           <a class="go" href="/experience"><span>Experience</span><span aria-hidden="true">→</span></a>
         </div>
+        <nav class="phone-reading" aria-label="More about Aditya">
+          <a href="/blog">Blogs <span aria-hidden="true">↗</span></a>
+          <a href="/resume">Résumé <span aria-hidden="true">↗</span></a>
+        </nav>
       </div>
     </div>
 
     <section class="highlights" aria-labelledby="highlights">
       <div class="highlights-head">
-        <h2 id="highlights" class="orbit-label">HIGHLIGHTED</h2>
+        <h2 id="highlights" class="orbit-label">Highlights</h2>
         <a href="/projects">all projects →</a>
       </div>
       <div class="hl-grid">
@@ -57,6 +75,24 @@ import { patents } from "../data/patents";
       </div>
     </section>
 
+    <section class="phone-experience" id="experience" aria-labelledby="experience-h">
+      <h2 id="experience-h" class="orbit-label"><a href="/experience">Experience</a></h2>
+      <ul class="phone-affiliations">
+        {roles.map(({card: [mark, org], role, start, end}) => (
+          <li><img class="affiliation-mark" loading="lazy" src={`/mark-${mark}.png`} alt="" width="44" height="44" />
+            <div><small>{start} – {end}</small><strong>{role}</strong><span>{org}</span></div>
+          </li>
+        ))}
+      </ul>
+    </section>
+    <section class="phone-education" aria-labelledby="education-h">
+      <h2 id="education-h" class="orbit-label">Education</h2>
+      <ul class="phone-affiliations">
+        <li><img class="affiliation-mark" loading="lazy" src="/mark-vit.png" alt="" width="44" height="44" />
+          <div><small>Sep 2022 – Apr 2026</small><strong>B.Tech. in Computer Science and Engineering</strong><span>Vellore Institute of Technology (VIT)</span></div>
+        </li>
+      </ul>
+    </section>
     <section id="research" class="home-research" aria-labelledby="research-h">
       <h2 id="research-h" class="orbit-label">RESEARCH</h2>
       <div class="glass-light r-section">

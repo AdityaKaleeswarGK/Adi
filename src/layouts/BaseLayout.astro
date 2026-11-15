@@ -22,22 +22,15 @@ const pageDesc = description ?? site.tagline;
 // canonical/og:url/og:image only render once `site` is set in astro.config.mjs
 // (otherwise a static build would bake in localhost URLs)
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
-// page change: the old page drifts up and softens away, the new one settles in from below
-// (keyframes live in orbit.css; reduced-motion users get an instant swap)
-const pageTurn = {
-  forwards: {
-    old: { name: "orbit-out", duration: "180ms", easing: "cubic-bezier(.4,0,1,1)", fillMode: "both" },
-    new: { name: "orbit-in", duration: "380ms", delay: "60ms", easing: "cubic-bezier(.16,1,.3,1)", fillMode: "both" },
-  },
-  backwards: {
-    old: { name: "orbit-out", duration: "180ms", easing: "cubic-bezier(.4,0,1,1)", fillMode: "both" },
-    new: { name: "orbit-in", duration: "380ms", delay: "60ms", easing: "cubic-bezier(.16,1,.3,1)", fillMode: "both" },
-  },
+const quickTurn = {
+  old: { name: "orbit-out", duration: "70ms", easing: "ease-out", fillMode: "both" },
+  new: { name: "orbit-in", duration: "140ms", easing: "ease-out", fillMode: "both" },
 };
+const pageTurn = { forwards: quickTurn, backwards: quickTurn };
 ---
 
 <!doctype html>
-<html lang="en" data-sky={animatedBackground ? "on" : "off"}>
+<html lang="en" transition:animate="none" data-sky={animatedBackground ? "on" : "off"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
