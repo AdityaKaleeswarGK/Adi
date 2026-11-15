@@ -88,6 +88,7 @@ function rotAxis(phi, a) { return mul(rotZ(phi), mul(rotX(a), rotZ(-phi))); }
 // have two more each. Rahu and Ketu are looked at but do not look.
 var DRISHTI = { Sun: [7], Moon: [7], Mercury: [7], Venus: [7], Mars: [4, 7, 8], Jupiter: [5, 7, 9], Saturn: [3, 7, 10] };
 var TAU = Math.PI * 2;
+const PAGE_TURN_MS = 1360;
 
 class Sky {
   constructor(canvas) {
@@ -284,21 +285,11 @@ class Sky {
     this.updateLinks(dt);
     // a page change: the camera lifts toward face-on and drops back while the gimbal rings
     // each go once round their own axis, coming to rest exactly where they were
-    var pulse = 0;
-    if (this.pulseT != null) {
-      this.pulseT += dt;
-      var pt = Math.min(1, this.pulseT / 1.1);
-      pulse = Math.sin(Math.PI * pt);
-      pulse *= pulse;
-      if (pt >= 1) this.pulseT = null;
-    }
-    var turn = 0;
-    if (this.ringT != null) {
-      this.ringT += dt;
-      var rt = Math.min(1, this.ringT / 1.5);
-      turn = rt < 0.5 ? 4 * rt * rt * rt : 1 - Math.pow(-2 * rt + 2, 3) / 2;
-      if (rt >= 1) { this.ringT = null; turn = 0; }
-    }
+    const phase = this.turnStart == null ? 1 : clamp01((performance.now() - this.turnStart) / PAGE_TURN_MS);
+    const turn = phase < 1 ? this.turnFrom + (1 - this.turnFrom) * smooth(phase) : 0;
+    this.turnAngle = turn;
+    const pulse = phase < 1 ? 0.5 * Math.sin(Math.PI * phase) ** 2 : 0;
+    if (phase === 1) this.turnStart = null;
     // the visit opens on the chart as the jaathagam draws it: flat, face-on, at the moment of
     // birth. As the grahas travel to today it turns once and leans back into an instrument,
     // and the rings tumble in from wherever they were and lock.
@@ -524,7 +515,21 @@ export function startSky(canvas) {
   sky.init();
   window.__sky = sky;
   var place = function () { if (sky.w) sky.cur = sky.layoutFor(sky.page); };
-  document.addEventListener('astro:before-preparation', function () { if (!sky.reduced) { sky.pulseT = 0; sky.ringT = 0; } });
+  document.addEventListener('astro:before-preparation', event => {
+    const load = event.loader;
+    event.loader = async () => {
+      await load();
+      if (event.defaultPrevented || event.signal.aborted || sky.reduced ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+          document.documentElement.dataset.sky !== 'on' ||
+          event.newDocument.documentElement.dataset.sky !== 'on') return;
+      // Both pages are ready. Swap halfway, keeping the same canvas and clock
+      // for the second half. An interrupted turn resumes from its visible angle.
+      sky.turnFrom = sky.turnAngle || 0;
+      sky.turnStart = performance.now();
+      await new Promise(resolve => setTimeout(resolve, PAGE_TURN_MS / 2));
+    };
+  });
   document.addEventListener('astro:page-load', place);
   window.addEventListener('load', place);
   return sky;
