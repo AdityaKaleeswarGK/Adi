@@ -1,6 +1,9 @@
 // The jaathagam sky behind every page.
-// The wheel is the birth chart from the jaathagam; on a fresh visit it spins in while the
-// grahas travel by their real orbits from the morning of birth to today, then settles.
+// The chakra is the birth chart from the jaathagam, built as an instrument: the chart is a
+// disc held in three gimbal rings (nakshatra, rasi, and a meridian ring on the lagna axis),
+// seen leaning back in 3-D. A fresh visit opens on the flat chart at the moment of birth; as
+// the grahas travel by their real orbits to today, it leans back and the rings tumble in and
+// lock. Threads between grahas are the drishti graph of the sky as it stands.
 // Planet positions: JPL approximate orbital elements (Standish), geocentric, Lahiri sidereal.
 // The canvas is persisted across view-transition navigations, so this runs once per visit.
 
@@ -66,6 +69,25 @@ function jdNow() { return Date.now() / 86400000 + 2440587.5; }
 function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
 function smooth(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
+
+// 3x3 rotations, row-major. Screen y points down and +z points at the viewer, so a positive
+// turn about x brings the lower half of the chart forward.
+function mul(A, B) {
+  var o = new Array(9);
+  for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) o[r * 3 + c] = A[r * 3] * B[c] + A[r * 3 + 1] * B[3 + c] + A[r * 3 + 2] * B[6 + c];
+  return o;
+}
+function rotX(a) { var c = Math.cos(a), s = Math.sin(a); return [1, 0, 0, 0, c, -s, 0, s, c]; }
+function rotY(a) { var c = Math.cos(a), s = Math.sin(a); return [c, 0, s, 0, 1, 0, -s, 0, c]; }
+function rotZ(a) { var c = Math.cos(a), s = Math.sin(a); return [c, -s, 0, s, c, 0, 0, 0, 1]; }
+// a turn by `a` about a diameter of the chart lying at in-plane angle `phi`
+function rotAxis(phi, a) { return mul(rotZ(phi), mul(rotX(a), rotZ(-phi))); }
+
+// graha drishti: every graha looks at the 7th house from its own; Mars, Jupiter and Saturn
+// have two more each. Rahu and Ketu are looked at but do not look.
+var DRISHTI = { Sun: [7], Moon: [7], Mercury: [7], Venus: [7], Mars: [4, 7, 8], Jupiter: [5, 7, 9], Saturn: [3, 7, 10] };
+var TAU = Math.PI * 2;
 
 class Sky {
   constructor(canvas) {
@@ -74,10 +96,12 @@ class Sky {
 
   init() {
     this.page = 'home';
-    this.journeySec = 9;
+    this.journeySec = 7;
     this.settleSec = 1.8;
     this.tries = 0;
     this.flashes = [];
+    this.links = {};
+    this.tx = 0; this.ty = 0; this.px = 0; this.py = 0;
     this.setup();
   }
 
@@ -86,6 +110,7 @@ class Sky {
     if (this.retry) clearTimeout(this.retry);
     if (this.ro2) this.ro2.disconnect();
     window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('pointermove', this.onPointer);
   }
 
   setup() {
@@ -97,6 +122,12 @@ class Sky {
     this.reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
+    // the instrument leans a few degrees toward a mouse pointer
+    this.onPointer = (e) => {
+      if (e.pointerType !== 'mouse' || !this.w) return;
+      this.tx = e.clientX / this.w * 2 - 1; this.ty = e.clientY / this.h * 2 - 1;
+    };
+    if (!this.reduced) window.addEventListener('pointermove', this.onPointer, { passive: true });
     this.time = 0;
     this.resize();
     this.startJourney();
@@ -120,6 +151,9 @@ class Sky {
     if (this.tctx) this.tctx.clearRect(0, 0, this.S, this.S);
   }
 
+  // how far the chart leans back at rest: less on phones, where it frames the round photo
+  pose() { return this.w <= 960 ? 34 : 52; }
+
   // the chakra sits in the centre of every page, as large as fits with its whole rim on screen
   layoutFor(page) {
     var w = this.w, h = this.h;
@@ -135,7 +169,8 @@ class Sky {
       }
       return { x: w / 2, y: h * 0.42, R: Rm };
     }
-    var R = (Math.min(w, h - 120) / 2 - 8) / 1.2;
+    // leaning back, the chart is wider than it is tall, so it can be larger than a flat wheel
+    var R = Math.min((w / 2 - 24) / 1.3, ((h - 120) / 2 - 8) / 0.84);
     return { x: w / 2, y: h / 2 + 20, R: Math.max(80, R) };
   }
 
@@ -146,12 +181,12 @@ class Sky {
     this.w = w; this.h = h;
     this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.cur = this.layoutFor(this.page);
     // the trail is drawn once at a reference radius and scaled with the chakra
-    this.R0 = Math.min(w, h) * 0.36;
+    this.R0 = Math.min(480, Math.max(Math.min(w, h) * 0.36, this.cur.R));
     this.S = Math.ceil(this.R0 * 2.5);
     this.trail.width = Math.round(this.S * dpr); this.trail.height = Math.round(this.S * dpr);
     this.tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.cur = this.layoutFor(this.page);
     // a 3-D star field; each star has its own depth
     var seed = 5, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
     this.stars = [];
@@ -162,15 +197,20 @@ class Sky {
     if (upTo > 0) this.extendTrail(upTo);
   }
 
+  // a point on the chart's own plane: lagna on the left, longitudes running anticlockwise
   local(lon, frac, R) {
     var phi = Math.PI + rad(lon - LAGNA), r = R * frac;
     return [r * Math.cos(phi), -r * Math.sin(phi)];
   }
 
-  project(p) {
-    var cs = Math.cos(this.spin), sn = Math.sin(this.spin);
-    return [this.cur.x + p[0] * cs - p[1] * sn, this.cur.y + (this.dy || 0) + p[0] * sn + p[1] * cs];
+  // chart-plane point (plus height off the plane) -> [screen x, screen y, depth toward the viewer]
+  proj(M, p, z) {
+    z = z || 0;
+    return [this.ox + M[0] * p[0] + M[1] * p[1] + M[2] * z, this.oy + M[3] * p[0] + M[4] * p[1] + M[5] * z, M[6] * p[0] + M[7] * p[1] + M[8] * z];
   }
+
+  // 0 at the far rim, 1 at the near rim
+  near(z) { return clamp01(0.5 + 0.5 * z / (this.cur.R * 0.95)); }
 
   radius(g, dist) {
     if (g.band[0] === g.band[1]) return g.band[0];
@@ -201,47 +241,78 @@ class Sky {
     this.trailDay = toDay;
   }
 
+  // which graha looks at which, in the sky as it stands; each link fades in and out on its own
+  updateLinks(dt) {
+    var sky = this.sky, want = {}, self = this;
+    var rasi = function (k) { return Math.floor(sky[k][0] / 30); };
+    GRAHAS.forEach(function (a) {
+      var looks = DRISHTI[a.key];
+      if (!looks || (a.key === 'Moon' && !self.live)) return;
+      GRAHAS.forEach(function (b) {
+        if (a === b || (b.key === 'Moon' && !self.live)) return;
+        var house = ((rasi(b.key) - rasi(a.key) + 12) % 12) + 1;
+        if (looks.indexOf(house) >= 0) want[a.key + '>' + b.key] = 1;
+      });
+    });
+    var k, rate = dt > 0 ? Math.min(1, dt * 3) : 1;
+    for (k in want) if (!(k in this.links)) this.links[k] = 0;
+    for (k in this.links) {
+      this.links[k] += ((want[k] ? 1 : 0) - this.links[k]) * rate;
+      if (!want[k] && this.links[k] < 0.01) delete this.links[k];
+    }
+  }
+
   tick(dt) {
     // the page can start with a zero-size viewport (a hidden tab); size the sky once it has one
     if (!this.stars) { this.resize(); if (!this.stars) return; }
     this.time += dt;
     var sy = window.scrollY || window.pageYOffset || 0;
     this.scroll = (this.scroll || 0) + (sy - (this.scroll || 0)) * Math.min(1, dt * 8);
+    this.px += (this.tx - this.px) * Math.min(1, dt * 2.5);
+    this.py += (this.ty - this.py) * Math.min(1, dt * 2.5);
     this.elapsed += dt;
     var nowJd = jdNow(), t = Math.min(1, this.elapsed / this.journeySec);
     this.live = t >= 1;
-    this.jd = this.live ? nowJd : BIRTH_JD + ease(t) * (nowJd - BIRTH_JD);
+    var e = ease(t), w = 1 - e;
+    this.jd = this.live ? nowJd : BIRTH_JD + e * (nowJd - BIRTH_JD);
     this.sky = skyAt(this.jd);
     this.extendTrail(Math.floor(this.jd - BIRTH_JD));
-    // spin in fast, slowing to rest exactly as the sky reaches today
-    this.spin = Math.PI * 5 * Math.pow(1 - ease(t), 2);
-    // on a page change the chakra gives a small turn and the stars drift past a little faster,
-    // then everything eases back to rest (the chart's orientation ends exactly where it was)
+    this.updateLinks(dt);
+    // a page change: the camera lifts toward face-on and drops back while the gimbal rings
+    // each go once round their own axis, coming to rest exactly where they were
     var pulse = 0;
     if (this.pulseT != null) {
       this.pulseT += dt;
-      var pt = Math.min(1, this.pulseT / 0.8);
+      var pt = Math.min(1, this.pulseT / 1.1);
       pulse = Math.sin(Math.PI * pt);
       pulse *= pulse;
       if (pt >= 1) this.pulseT = null;
     }
-    // the two outer bands turn against each other by a third of a circle and settle; the
-    // 30° rasi and 13⅓° nakshatra marks both repeat every 120°, so the dial comes to rest
-    // looking exactly as before and the chart stays true
-    this.rotA = 0; this.rotB = 0;
+    var turn = 0;
     if (this.ringT != null) {
       this.ringT += dt;
-      var rt = Math.min(1, this.ringT / 1.2);
-      var re = rt < 0.5 ? 4 * rt * rt * rt : 1 - Math.pow(-2 * rt + 2, 3) / 2;
-      this.rotA = 120 * re;
-      this.rotB = -120 * re;
-      if (rt >= 1) { this.ringT = null; this.rotA = 0; this.rotB = 0; }
+      var rt = Math.min(1, this.ringT / 1.5);
+      turn = rt < 0.5 ? 4 * rt * rt * rt : 1 - Math.pow(-2 * rt + 2, 3) / 2;
+      if (rt >= 1) { this.ringT = null; turn = 0; }
     }
+    // the visit opens on the chart as the jaathagam draws it: flat, face-on, at the moment of
+    // birth. As the grahas travel to today it turns once and leans back into an instrument,
+    // and the rings tumble in from wherever they were and lock.
+    var tilt = rad((this.pose() + Math.min(14, this.scroll * 0.02)) * e - 4 * this.py - 12 * pulse);
+    var yaw = rad(6 * this.px + 2.5 * Math.sin(this.time * 0.13) * e);
+    var roll = rad(-11 * e + 1.2 * Math.sin(this.time * 0.09) * e);
+    this.M = mul(rotZ(roll), mul(rotY(yaw), mul(rotX(tilt), rotZ(Math.PI * 1.5 * w * w))));
+    var wind = Math.pow(w, 1.5), prec = this.time * 0.07;
+    // nakshatra ring, rasi ring, and the meridian ring that swings about the lagna axis:
+    // at rest each sits a few degrees off the chart, and that lean slowly precesses
+    this.MA = mul(this.M, mul(rotAxis(prec, rad(7) * e), rotAxis(rad(20), TAU * (1.1 * wind + turn))));
+    this.MB = mul(this.M, mul(rotAxis(prec + 2.1, rad(-9) * e), rotAxis(rad(110), -TAU * (0.8 * wind + turn))));
+    this.MC = mul(this.M, rotX(rad(64) + rad(5) * Math.sin(prec * 1.7) + TAU * (0.6 * wind + turn)));
     // after it lands: planets brighten, rings step back
     this.settle = smooth((this.elapsed - this.journeySec) / this.settleSec);
+    this.wheelAlpha = smooth(this.elapsed / 0.9);
+    this.grow = 0.84 + 0.16 * (1 - Math.pow(1 - Math.min(1, this.elapsed / 1.8), 3));
     var speed = 0.02 + 0.16 * pulse;
-    this.wheelAlpha = 1;
-    var self = this;
     this.stars.forEach(function (s) {
       s.pz = s.z;
       s.z -= speed * dt;
@@ -253,17 +324,66 @@ class Sky {
   // how far a layer slides as the page scrolls: nearer layers slide more, which reads as depth
   shift(k) { return -Math.min(56, (this.scroll || 0) * k); }
 
-  annulus(ox, oy, r1, r2, c1, c2) {
-    var ctx = this.ctx, g = ctx.createLinearGradient(ox - r2, oy - r2, ox + r2, oy + r2);
-    g.addColorStop(0, c1); g.addColorStop(1, c2);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox, oy, r2, 0, 6.2832); ctx.arc(ox, oy, r1, 0, 6.2832, true); ctx.fill();
+  // run `fn` with the canvas mapped onto a ring's (or the chart's) own plane
+  onPlane(M, fn) {
+    var ctx = this.ctx;
+    ctx.save();
+    ctx.transform(M[0], M[3], M[1], M[4], this.ox, this.oy);
+    fn(ctx);
+    ctx.restore();
+  }
+
+  // one circle of a ring, drawn in short arcs so the near side is bright and heavy and the
+  // far side thin and faint; `front` picks which half to draw
+  rim(M, frac, width, color, alpha, front) {
+    var ctx = this.ctx, R = this.R, N = 120, step = 3;
+    ctx.strokeStyle = color;
+    for (var i = 0; i < N; i += step) {
+      var am = (i + step / 2) / N * TAU;
+      var z = (M[6] * Math.cos(am) + M[7] * Math.sin(am)) * R * frac;
+      if ((z >= 0) !== front) continue;
+      var nr = this.near(z);
+      ctx.globalAlpha = alpha * (0.22 + 0.78 * nr); ctx.lineWidth = width * (0.5 + 0.8 * nr);
+      ctx.beginPath();
+      for (var j = 0; j <= step; j++) {
+        var a = (i + j) / N * TAU, x = R * frac * Math.cos(a), y = R * frac * Math.sin(a);
+        var X = this.ox + M[0] * x + M[1] * y, Y = this.oy + M[3] * x + M[4] * y;
+        if (j === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  ticks(M, count, r1, r2of, color, alphaOf, front) {
+    var ctx = this.ctx, R = this.R;
+    ctx.strokeStyle = color; ctx.lineWidth = 1;
+    for (var q = 0; q < count; q++) {
+      var lon = q * 360 / count;
+      var a = this.proj(M, this.local(lon, r1, R)), b = this.proj(M, this.local(lon, r2of(q), R));
+      if ((a[2] >= 0) !== front) continue;
+      ctx.globalAlpha = alphaOf(q) * (0.25 + 0.75 * this.near(a[2]));
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    }
+  }
+
+  // the three gimbal rings; called once for their far halves and once for their near halves
+  rings(front, ringA) {
+    var isNak = function (q) { return q % 4 === 0; };
+    this.rim(this.MC, this.w <= 960 ? 1.21 : 1.27, 1.1, 'rgb(160,176,232)', 0.55 * ringA, front);
+    this.rim(this.MA, 1.0, 1.8, 'rgb(255,236,205)', 0.9 * ringA, front);
+    this.rim(this.MA, 1.075, 0.9, 'rgb(255,236,205)', 0.45 * ringA, front);
+    this.ticks(this.MA, 108, 1.0, function (q) { return isNak(q) ? 1.075 : 1.025; }, 'rgb(220,224,236)', function (q) { return (isNak(q) ? 0.7 : 0.32) * ringA; }, front);
+    this.rim(this.MB, 1.105, 1.1, 'rgb(255,236,205)', 0.6 * ringA, front);
+    this.rim(this.MB, 1.175, 2.4, 'rgb(242,193,78)', 0.75 * ringA, front);
+    this.ticks(this.MB, 12, 1.105, function () { return 1.175; }, 'rgb(242,193,78)', function () { return 0.8 * ringA; }, front);
   }
 
   draw() {
     var ctx = this.ctx, w = this.w, h = this.h, tm = this.time, self = this;
-    if (!ctx || !this.sky || !this.cur) return;
-    var R = this.cur.R, ox = this.cur.x, oy0 = this.cur.y, st = this.settle || 0, wa = this.wheelAlpha;
-    var showLabels = false;
+    if (!ctx || !this.sky || !this.cur || !this.M) return;
+    var R = this.cur.R * this.grow, st = this.settle || 0, wa = this.wheelAlpha, M = this.M;
+    this.R = R; this.ox = this.cur.x; this.oy = this.cur.y + this.shift(0.03);
+    var ox = this.ox, oy = this.oy;
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = '#030409'; ctx.fillRect(0, 0, w, h);
     // stars: each sits at its own depth, so near ones drift further when you scroll
@@ -284,71 +404,77 @@ class Sky {
         if (near > 0.7) { ctx.globalAlpha *= 0.3; ctx.beginPath(); ctx.arc(sx, sy, size * 2.6, 0, 6.2832); ctx.fill(); }
       }
     });
-    var ringA = wa * (1 - 0.55 * st);
-    // layer 0 (deepest): the dome of light
-    var oy = oy0 + this.shift(0.012);
-    var dome = ctx.createRadialGradient(ox - R * 0.35, oy - R * 0.4, R * 0.05, ox, oy, R * 1.18);
-    dome.addColorStop(0, 'rgba(140,160,255,' + (0.14 * ringA) + ')'); dome.addColorStop(0.6, 'rgba(70,84,170,' + (0.05 * ringA) + ')'); dome.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.globalAlpha = 1; ctx.fillStyle = dome; ctx.beginPath(); ctx.arc(ox, oy, R * 1.18, 0, 6.2832); ctx.fill();
-    // layer 1: the rosette of trails
-    this.dy = this.shift(0.022);
-    ctx.save();
-    ctx.globalAlpha = wa * (1 - 0.35 * st);
-    ctx.translate(ox, oy0 + this.dy); ctx.rotate(this.spin); ctx.scale(R / this.R0, R / this.R0);
-    ctx.drawImage(this.trail, -this.S / 2, -this.S / 2, this.S, this.S);
-    ctx.restore();
-    function rim(cyy, frac, wdt, hi, lo) {
-      var g = ctx.createLinearGradient(ox - R * frac, cyy - R * frac, ox + R * frac, cyy + R * frac);
-      g.addColorStop(0, hi); g.addColorStop(1, lo);
-      ctx.strokeStyle = g; ctx.lineWidth = wdt;
-      ctx.beginPath(); ctx.arc(ox, cyy, R * frac, 0, 6.2832); ctx.stroke();
-    }
-    // layer 2: the nakshatra band, a glassy annulus with its ticks
-    this.dy = this.shift(0.035);
-    var y2 = oy0 + this.dy;
-    ctx.globalAlpha = ringA;
-    this.annulus(ox, y2, R * 1.0, R * 1.08, 'rgba(255,236,205,0.10)', 'rgba(60,70,120,0.03)');
-    rim(y2, 1.0, 1.8, 'rgba(255,236,205,0.85)', 'rgba(120,130,190,0.18)');
-    ctx.lineWidth = 1;
-    for (var q = 0; q < 108; q++) {
-      var lon = q * 10 / 3, isNak = q % 4 === 0;
-      var a1 = this.project(this.local(lon + (this.rotA || 0), 1, R)), b1 = this.project(this.local(lon + (this.rotA || 0), isNak ? 1.08 : 1.025, R));
-      ctx.strokeStyle = isNak ? 'rgba(220,224,236,0.6)' : 'rgba(220,224,236,0.28)';
-      ctx.beginPath(); ctx.moveTo(a1[0], a1[1]); ctx.lineTo(b1[0], b1[1]); ctx.stroke();
-    }
-    if (showLabels) {
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = '11px "Noto Sans Tamil", sans-serif'; ctx.fillStyle = 'rgba(220,224,236,0.6)';
-      for (var k = 0; k < 27; k++) { var m = this.project(this.local((k + 0.5) * 40 / 3, 1.04, R)); ctx.fillText(NAK[k], m[0], m[1]); }
-    }
-    // layer 3: the rasi band in gold, a step nearer
-    this.dy = this.shift(0.05);
-    var y3 = oy0 + this.dy;
-    this.annulus(ox, y3, R * 1.08, R * 1.15, 'rgba(242,193,78,0.12)', 'rgba(242,193,78,0.02)');
-    rim(y3, 1.08, 1.1, 'rgba(255,236,205,0.6)', 'rgba(120,130,190,0.12)');
-    rim(y3, 1.15, 2.4, 'rgba(242,193,78,0.6)', 'rgba(120,130,190,0.08)');
-    ctx.lineWidth = 1;
-    for (var r = 0; r < 12; r++) {
-      var a2 = this.project(this.local(r * 30 + (this.rotB || 0), 1.08, R)), b2 = this.project(this.local(r * 30 + (this.rotB || 0), 1.15, R));
-      ctx.strokeStyle = 'rgba(242,193,78,0.7)';
-      ctx.beginPath(); ctx.moveTo(a2[0], a2[1]); ctx.lineTo(b2[0], b2[1]); ctx.stroke();
-    }
-    // lagna and earth sit with the trails
-    this.dy = this.shift(0.022);
-    var l0 = this.project(this.local(LAGNA, 0.08, R)), l1 = this.project(this.local(LAGNA, 1.15, R));
+    var ringA = wa * (1 - 0.25 * st);
+    // the pool of light the chart floats on, lying in its plane
+    this.onPlane(M, function (c) {
+      var dome = c.createRadialGradient(-R * 0.3, -R * 0.35, R * 0.05, 0, 0, R * 1.2);
+      dome.addColorStop(0, 'rgba(140,160,255,' + (0.15 * ringA) + ')'); dome.addColorStop(0.6, 'rgba(70,84,170,' + (0.05 * ringA) + ')'); dome.addColorStop(1, 'rgba(0,0,0,0)');
+      c.globalAlpha = 1; c.fillStyle = dome; c.beginPath(); c.arc(0, 0, R * 1.2, 0, 6.2832); c.fill();
+    });
+    // the glassy faces of the two bands, each in its own plane
+    var band = function (Mr, r1, r2, rgb, a) {
+      self.onPlane(Mr, function (c) {
+        c.globalAlpha = ringA; c.fillStyle = 'rgba(' + rgb + ',' + a + ')';
+        c.beginPath(); c.arc(0, 0, R * r2, 0, 6.2832); c.arc(0, 0, R * r1, 0, 6.2832, true); c.fill();
+      });
+    };
+    band(this.MA, 1.0, 1.075, '255,236,205', 0.06);
+    band(this.MB, 1.105, 1.175, '242,193,78', 0.07);
+    // far halves of the rings go behind everything on the chart
+    this.rings(false, ringA);
+    // the rosette of trails, lying on the chart
+    this.onPlane(M, function (c) {
+      c.globalAlpha = wa * (1 - 0.35 * st);
+      c.scale(R / self.R0, R / self.R0);
+      c.drawImage(self.trail, -self.S / 2, -self.S / 2, self.S, self.S);
+    });
+    // lagna line, the axle through the chart, and earth at the centre
+    var l0 = this.proj(M, this.local(LAGNA, 0.08, R)), l1 = this.proj(M, this.local(LAGNA, 1.0, R));
+    ctx.globalAlpha = ringA; ctx.lineWidth = 1;
     ctx.setLineDash([3, 5]); ctx.strokeStyle = 'rgba(234,90,61,0.8)';
     ctx.beginPath(); ctx.moveTo(l0[0], l0[1]); ctx.lineTo(l1[0], l1[1]); ctx.stroke(); ctx.setLineDash([]);
-    ctx.globalAlpha = wa; ctx.fillStyle = '#BFD3FF'; ctx.beginPath(); ctx.arc(ox, oy0 + this.dy, 2.5, 0, 6.2832); ctx.fill();
-    // layer 4 (nearest): the grahas, each band at its own depth so outer planets float a touch nearer
+    var ax0 = this.proj(M, [0, 0], -R * 0.2), ax1 = this.proj(M, [0, 0], R * 0.2);
+    ctx.globalAlpha = 0.5 * ringA; ctx.strokeStyle = 'rgb(160,176,232)';
+    ctx.beginPath(); ctx.moveTo(ax0[0], ax0[1]); ctx.lineTo(ax1[0], ax1[1]); ctx.stroke();
+    ctx.globalAlpha = wa; ctx.fillStyle = '#BFD3FF'; ctx.beginPath(); ctx.arc(ox, oy, 2.5, 0, 6.2832); ctx.fill();
+    // where each graha stood at birth: a small mark lying flat on the chart
+    this.onPlane(M, function (c) {
+      c.lineWidth = 1;
+      GRAHAS.forEach(function (g) {
+        var n = self.local(g.natalLon, (g.band[0] + g.band[1]) / 2, R);
+        c.globalAlpha = 0.5 * wa; c.strokeStyle = g.color;
+        c.beginPath(); c.arc(n[0], n[1], 5.5, 0, 6.2832); c.stroke();
+      });
+    });
+    // where each graha is now
+    var at = {}, order = [];
     GRAHAS.forEach(function (g) {
-      var mid = (g.band[0] + g.band[1]) / 2;
-      self.dy = self.shift(0.04 + 0.04 * mid);
-      var n = self.project(self.local(g.natalLon, mid, R));
-      ctx.globalAlpha = 0.45 * wa; ctx.strokeStyle = g.color; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(n[0], n[1], 5, 0, 6.2832); ctx.stroke();
-      var s = self.sky[g.key], fr = self.radius(g, s[1]), p = self.project(self.local(s[0], fr, R));
+      var s = self.sky[g.key], fr = self.radius(g, s[1]);
+      at[g.key] = { g: g, fr: fr, p: self.proj(M, self.local(s[0], fr, R)) };
+      order.push(at[g.key]);
+    });
+    // the drishti graph: a thread from each graha to the ones it looks at, with a pulse
+    // running along it in the direction of the gaze
+    var k;
+    for (k in this.links) {
+      var ends = k.split('>'), A = at[ends[0]], B = at[ends[1]], la = this.links[k] * wa * (0.3 + 0.7 * st);
+      if (la < 0.01) continue;
+      var grad = ctx.createLinearGradient(A.p[0], A.p[1], B.p[0], B.p[1]);
+      grad.addColorStop(0, A.g.color); grad.addColorStop(1, B.g.color);
+      ctx.globalAlpha = 0.3 * la; ctx.strokeStyle = grad; ctx.lineWidth = 0.9;
+      ctx.beginPath(); ctx.moveTo(A.p[0], A.p[1]); ctx.lineTo(B.p[0], B.p[1]); ctx.stroke();
+      if (!this.reduced) {
+        var u = (tm * 0.32 + (k.charCodeAt(0) * 7 + k.charCodeAt(k.length - 2) * 13) % 10 / 10) % 1;
+        ctx.globalAlpha = 0.9 * la * Math.sin(Math.PI * u); ctx.fillStyle = A.g.color;
+        ctx.beginPath(); ctx.arc(A.p[0] + (B.p[0] - A.p[0]) * u, A.p[1] + (B.p[1] - A.p[1]) * u, 1.5, 0, 6.2832); ctx.fill();
+      }
+    }
+    // the grahas, far ones first; nearer ones are drawn larger
+    order.sort(function (a, b) { return a.p[2] - b.p[2]; });
+    order.forEach(function (o) {
+      var g = o.g, p = o.p, nr = self.near(p[2]);
       var dim = (g.key === 'Moon' && !self.live) ? 0.4 : 1;
-      var size = (g.key === 'Sun' ? 5.5 : g.key === 'Jupiter' || g.key === 'Saturn' ? 4 : 3.2) * (1 + 0.45 * st) * (0.8 + 0.3 * fr) * (R / self.R0 > 0.8 ? 1 : 0.85);
+      var size = (g.key === 'Sun' ? 5.5 : g.key === 'Jupiter' || g.key === 'Saturn' ? 4 : 3.2) * (1 + 0.45 * st) * (0.8 + 0.3 * o.fr) * (0.72 + 0.56 * nr) * (R > 240 ? 1 : 0.85);
       var glow = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], size * (6 + 4 * st));
       glow.addColorStop(0, g.color); glow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.globalAlpha = (0.4 + 0.35 * st) * dim * wa; ctx.fillStyle = glow;
@@ -357,9 +483,9 @@ class Sky {
       ball.addColorStop(0, '#FFFFFF'); ball.addColorStop(0.35, g.color); ball.addColorStop(1, 'rgba(3,4,9,0.9)');
       ctx.globalAlpha = dim * wa; ctx.fillStyle = ball;
       ctx.beginPath(); ctx.arc(p[0], p[1], size * 1.25, 0, 6.2832); ctx.fill();
-      if (showLabels) { ctx.font = '11px "Noto Sans Tamil", sans-serif'; ctx.fillStyle = g.color; ctx.fillText(g.ab, p[0] + 12, p[1] - 10); }
     });
-    this.dy = 0;
+    // near halves of the rings pass in front
+    this.rings(true, ringA);
     ctx.globalAlpha = 1; ctx.lineWidth = 1;
   }
 
