@@ -165,7 +165,7 @@ class Sky {
       if (anchor) {
         var r = anchor.getBoundingClientRect();
         var y = r.top + (window.scrollY || 0) + r.height / 2;
-        if (r.height > 0) return { x: w / 2, y: y, R: Rm };
+        if (r.height > 0) return { x: w / 2, y: y, R: Rm, portrait: true };
       }
       return { x: w / 2, y: h * 0.42, R: Rm };
     }
@@ -298,16 +298,16 @@ class Sky {
     // the visit opens on the chart as the jaathagam draws it: flat, face-on, at the moment of
     // birth. As the grahas travel to today it turns once and leans back into an instrument,
     // and the rings tumble in from wherever they were and lock.
-    var tilt = rad((this.pose() + Math.min(14, this.scroll * 0.02)) * e - 4 * this.py - 12 * pulse);
-    var yaw = rad(6 * this.px + 2.5 * Math.sin(this.time * 0.13) * e);
+    var tilt = rad((this.pose() + Math.min(14, this.scroll * 0.02)) * e - 5 * this.py - 12 * pulse);
+    var yaw = rad(8 * this.px + 3.5 * Math.sin(this.time * 0.13) * e);
     var roll = rad(-11 * e + 1.2 * Math.sin(this.time * 0.09) * e);
     this.M = mul(rotZ(roll), mul(rotY(yaw), mul(rotX(tilt), rotZ(Math.PI * 1.5 * w * w))));
-    var wind = Math.pow(w, 1.5), prec = this.time * 0.07;
+    var wind = Math.pow(w, 1.5), prec = this.time * 0.09;
     // nakshatra ring, rasi ring, and the meridian ring that swings about the lagna axis:
     // at rest each sits a few degrees off the chart, and that lean slowly precesses
-    this.MA = mul(this.M, mul(rotAxis(prec, rad(7) * e), rotAxis(rad(20), TAU * (1.1 * wind + turn))));
-    this.MB = mul(this.M, mul(rotAxis(prec + 2.1, rad(-9) * e), rotAxis(rad(110), -TAU * (0.8 * wind + turn))));
-    this.MC = mul(this.M, rotX(rad(64) + rad(5) * Math.sin(prec * 1.7) + TAU * (0.6 * wind + turn)));
+    this.MA = mul(this.M, mul(rotAxis(prec, rad(9) * e), rotAxis(rad(20), TAU * (1.1 * wind + turn))));
+    this.MB = mul(this.M, mul(rotAxis(prec + 2.1, rad(-12) * e), rotAxis(rad(110), -TAU * (0.8 * wind + turn))));
+    this.MC = mul(this.M, rotX(rad(64) + rad(7) * Math.sin(prec * 1.7) + TAU * (0.6 * wind + turn)));
     // after it lands: planets brighten, rings step back
     this.settle = smooth((this.elapsed - this.journeySec) / this.settleSec);
     this.wheelAlpha = smooth(this.elapsed / 0.9);
@@ -418,21 +418,41 @@ class Sky {
         c.beginPath(); c.arc(0, 0, R * r2, 0, 6.2832); c.arc(0, 0, R * r1, 0, 6.2832, true); c.fill();
       });
     };
-    band(this.MA, 1.0, 1.075, '255,236,205', 0.06);
-    band(this.MB, 1.105, 1.175, '242,193,78', 0.07);
-    // far halves of the rings go behind everything on the chart
-    this.rings(false, ringA);
+    // Scale only the frame about its projected bottom edge. The chart and
+    // portrait keep their centre; leave a few pixels at either side on phones.
+    let frameScale = 1, frameBottom = oy;
+    if (this.cur.portrait) {
+      const extent = (row) => R * Math.max(
+        1.075 * Math.hypot(this.MA[row], this.MA[row + 1]),
+        1.175 * Math.hypot(this.MB[row], this.MB[row + 1]),
+        1.21 * Math.hypot(this.MC[row], this.MC[row + 1])
+      );
+      frameScale = Math.max(1, Math.min(1.10, (w / 2 - 3) / extent(0)));
+      frameBottom += extent(3);
+    }
+    const drawFrame = (front) => {
+      ctx.save();
+      if (frameScale !== 1) {
+        ctx.translate(ox, frameBottom);
+        ctx.scale(frameScale, frameScale);
+        ctx.translate(-ox, -frameBottom);
+      }
+      if (!front) {
+        band(this.MA, 1.0, 1.075, '255,236,205', 0.06);
+        band(this.MB, 1.105, 1.175, '242,193,78', 0.07);
+      }
+      this.rings(front, ringA);
+      ctx.restore();
+    };
+    drawFrame(false);
     // the rosette of trails, lying on the chart
     this.onPlane(M, function (c) {
       c.globalAlpha = wa * (1 - 0.35 * st);
       c.scale(R / self.R0, R / self.R0);
       c.drawImage(self.trail, -self.S / 2, -self.S / 2, self.S, self.S);
     });
-    // lagna line, the axle through the chart, and earth at the centre
-    var l0 = this.proj(M, this.local(LAGNA, 0.08, R)), l1 = this.proj(M, this.local(LAGNA, 1.0, R));
-    ctx.globalAlpha = ringA; ctx.lineWidth = 1;
-    ctx.setLineDash([3, 5]); ctx.strokeStyle = 'rgba(234,90,61,0.8)';
-    ctx.beginPath(); ctx.moveTo(l0[0], l0[1]); ctx.lineTo(l1[0], l1[1]); ctx.stroke(); ctx.setLineDash([]);
+    // The axle through the chart and Earth at the centre.
+    ctx.lineWidth = 1;
     var ax0 = this.proj(M, [0, 0], -R * 0.2), ax1 = this.proj(M, [0, 0], R * 0.2);
     ctx.globalAlpha = 0.5 * ringA; ctx.strokeStyle = 'rgb(160,176,232)';
     ctx.beginPath(); ctx.moveTo(ax0[0], ax0[1]); ctx.lineTo(ax1[0], ax1[1]); ctx.stroke();
@@ -485,7 +505,7 @@ class Sky {
       ctx.beginPath(); ctx.arc(p[0], p[1], size * 1.25, 0, 6.2832); ctx.fill();
     });
     // near halves of the rings pass in front
-    this.rings(true, ringA);
+    drawFrame(true);
     ctx.globalAlpha = 1; ctx.lineWidth = 1;
   }
 
