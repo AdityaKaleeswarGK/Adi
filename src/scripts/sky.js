@@ -152,22 +152,17 @@ class Sky {
   }
 
   // how far the chart leans back at rest: less on phones, where it frames the round photo
-  pose() { return this.w <= 960 ? 34 : 52; }
+  pose() { return this.cur?.compact ? 34 : 52; }
 
   // the chakra sits in the centre of every page, as large as fits with its whole rim on screen
   layoutFor(page) {
     var w = this.w, h = this.h;
-    // The compact homepage uses a viewport anchor; tablets still frame the portrait.
+    // Mid-width home shares the desktop background, independent of the photo.
     if (w <= 960) {
       var Rm = Math.min(w * 0.40, h * 0.24);
       var anchor = document.getElementById('sky-anchor');
-      if (anchor) {
-        if (w <= 700) return { x: w / 2, y: h * 0.40, R: Rm, portrait: true };
-        var r = anchor.getBoundingClientRect();
-        var y = r.top + (window.scrollY || 0) + r.height / 2;
-        if (r.height > 0) return { x: w / 2, y: y, R: Rm, portrait: true };
-      }
-      return { x: w / 2, y: h * 0.42, R: Rm };
+      if (!anchor) return { x: w / 2, y: h * 0.42, R: Rm, compact: true };
+      if (w <= 750) return { x: w / 2, y: h * 0.40, R: Rm, compact: true, portrait: true };
     }
     // leaning back, the chart is wider than it is tall, so it can be larger than a flat wheel
     var R = Math.min((w / 2 - 24) / 1.3, ((h - 120) / 2 - 8) / 0.84);
@@ -381,7 +376,7 @@ class Sky {
   // the three gimbal rings; called once for their far halves and once for their near halves
   rings(front, ringA) {
     var isNak = function (q) { return q % 4 === 0; };
-    this.rim(this.MC, this.w <= 960 ? 1.21 : 1.27, 1.1, 'rgb(160,176,232)', 0.55 * ringA, front);
+    this.rim(this.MC, this.cur.compact ? 1.21 : 1.27, 1.1, 'rgb(160,176,232)', 0.55 * ringA, front);
     this.rim(this.MA, 1.0, 1.8, 'rgb(255,236,205)', 0.9 * ringA, front);
     this.rim(this.MA, 1.075, 0.9, 'rgb(255,236,205)', 0.45 * ringA, front);
     this.ticks(this.MA, 108, 1.0, function (q) { return isNak(q) ? 1.075 : 1.025; }, 'rgb(220,224,236)', function (q) { return (isNak(q) ? 0.7 : 0.32) * ringA; }, front);
